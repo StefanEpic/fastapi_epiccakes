@@ -1,10 +1,10 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
-from sqlmodel import Session, select
+from sqlmodel import Session
 
 from db.db import get_session
-from models.store import ManufacturerRead, Manufacturer
+from models.store import ManufacturerRead, ManufacturerCreate, ManufacturerUpdate
 from repositories.store import ManufacturerRepository
 
 router = APIRouter(
@@ -15,30 +15,25 @@ router = APIRouter(
 
 @router.get('', response_model=List[ManufacturerRead])
 async def get_manufacturers(session: Session = Depends(get_session)):
-    manufacturers = await ManufacturerRepository(session).get_list()
-    return manufacturers
+    result = await ManufacturerRepository(session).get_list()
+    return result
 
+@router.get('/{manufacturer_id}', response_model=ManufacturerRead)
+async def get_manufacturer(manufacturer_id: int, session: Session = Depends(get_session)):
+    result = await ManufacturerRepository(session).get_one(manufacturer_id)
+    return result
 
-#
-# @router.post('', response_model=ManufacturerRead)
-# async def add_manufacturer(manufacturer: ManufacturerRead):
-#     manufacturer = await ManufacturerRepository().add_one(manufacturer)
-#     return manufacturer
+@router.post('', response_model=ManufacturerRead)
+async def add_manufacturer(manufacturer: ManufacturerCreate, session: Session = Depends(get_session)):
+    result = await ManufacturerRepository(session).add_one(manufacturer)
+    return result
 
-# @router.get('/{manufacturer_id}')
-# async def get_manufacturer(manufacturer_id: int):
-#     manufacturers = await ManufacturerRepository().get_one(id=manufacturer_id)
-#     return manufacturers
-#
-#
-# @router.patch('/{manufacturer_id}')
-# async def patch_manufacturer(manufacturer_id: int, manufacturer):
-#     manufacturer = manufacturer.model_dump()
-#     manufacturer = await ManufacturerRepository().edit_one(manufacturer, id=manufacturer_id)
-#     return manufacturer
-#
-#
-# @router.delete('/{manufacturer_id}')
-# async def patch_manufacturer(manufacturer_id: int):
-#     manufacturer = await ManufacturerRepository().delete_one(manufacturer_id)
-#     return manufacturer
+@router.patch('/{manufacturer_id}', response_model=ManufacturerRead)
+async def patch_manufacturer(manufacturer_id: int, manufacturer: ManufacturerUpdate, session: Session = Depends(get_session)):
+    result = await ManufacturerRepository(session).edit_one(manufacturer_id, manufacturer)
+    return result
+
+@router.delete('/{manufacturer_id}')
+async def patch_manufacturer(manufacturer_id: int, session: Session = Depends(get_session)):
+    result = await ManufacturerRepository(session).delete_one(manufacturer_id)
+    return result
