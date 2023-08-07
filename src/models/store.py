@@ -29,6 +29,10 @@ class Manufacturer(ManufacturerBase, table=True):
     registration_date: datetime = Field(default_factory=utcnow(), nullable=False)
 
 
+class ManufacturerCreate(ManufacturerBase):
+    pass
+    
+
 class ManufacturerRead(ManufacturerBase):
     id: int
     registration_date: datetime
