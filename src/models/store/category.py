@@ -1,7 +1,9 @@
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy.orm import validates
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
+
+from models.store.category_product_link import CategoryProductLink
 
 
 class CategoryBase(SQLModel):

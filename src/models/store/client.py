@@ -3,13 +3,12 @@ import datetime
 
 from typing import Optional
 
-from sqlalchemy.orm import validates
 from sqlmodel import SQLModel, Field
 
 
 class ClientStatus(enum.Enum):
-    "Действующий" = "active"
-    "Недействующий" = "inactive"
+    active = "Действующий"
+    inactive = "Недействующий"
 
 
 class ClientBase(SQLModel):

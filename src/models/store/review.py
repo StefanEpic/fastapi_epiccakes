@@ -2,7 +2,6 @@ import datetime
 
 from typing import Optional
 
-from sqlalchemy.orm import validates
 from sqlmodel import SQLModel, Field
 
 

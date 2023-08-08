@@ -3,18 +3,17 @@ import datetime
 
 from typing import Optional
 
-from sqlalchemy.orm import validates
 from sqlmodel import SQLModel, Field
 
 
 class ManufacturerStatus(enum.Enum):
-    "Действующий" = "active"
-    "Недействующий" = "inactive"
+    active = "Действующий"
+    inactive = "Недействующий"
 
 
 class ManufacturerBase(SQLModel):
     title: str = Field(unique=True)
-    description: Optional[str]
+    description: Optional[str] = Field(default=None)
     city: str
     street: str
     house: str
@@ -39,7 +38,7 @@ class ManufacturerRead(ManufacturerBase):
 
 
 class ManufacturerUpdate(SQLModel):
-    title: Optional[str] = Field(unique=True)
+    title: Optional[str]
     description: Optional[str]
     city: Optional[str]
     street: Optional[str]

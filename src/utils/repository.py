@@ -34,7 +34,7 @@ class SQLAlchemyRepository(AbstractRepository):
             self.session.add(res)
             await self.session.commit()
             await self.session.refresh(res)
-            return res.id
+            return res
         except ValueError as error:
             raise HTTPException(status_code=200, detail=str(error))
 
