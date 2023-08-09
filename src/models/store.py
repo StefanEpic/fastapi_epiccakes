@@ -16,11 +16,11 @@ class CategoryBase(SQLModel):
     title: str = Field(unique=True)
     description: Optional[str]
 
-    products: List["Product"] = Relationship(back_populates="categories", link_model=CategoryProductLink)
-
 
 class Category(CategoryBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+
+    products: List["Product"] = Relationship(back_populates="categories", link_model=CategoryProductLink)
 
 
 class CategoryCreate(CategoryBase):
@@ -34,8 +34,6 @@ class CategoryRead(CategoryBase):
 class CategoryUpdate(SQLModel):
     title: Optional[str] = Field(unique=True)
     description: Optional[str]
-
-    products: Optional[List["Product"]] = Relationship(back_populates="categories", link_model=CategoryProductLink)
 
 # -------------------
 # ----- Product -----
@@ -65,12 +63,15 @@ class ProductBase(SQLModel):
     price: float
 
     manufacturer_id: Optional[int] = Field(default=None, foreign_key="manufacturer.id")
-    categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink)
     orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
 
 
 class Product(ProductBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+
+    images: List["Image"] = Relationship(back_populates="product")
+    categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink)
+    manufacturer: Optional[Manufacturer] = Relationship(back_populates="products")
 
 
 class ProductCreate(ProductBase):
@@ -95,8 +96,7 @@ class ProductUpdate(SQLModel):
     # price: Optional[condecimal]
     price: Optional[float]
 
-    manufacturer_id: Optional[int] = Field(default=None, foreign_key="manufacturer.id")
-    categories: Optional[List["Category"]] = Relationship(back_populates="products", link_model=CategoryProductLink)
+    manufacturer_id: Optional[int]
     orders: Optional[List["Order"]] = Relationship(back_populates="products", link_model=OrderProductLink)
 
 # -------------------------------
@@ -119,6 +119,7 @@ class ImageBase(SQLModel):
 
 class Image(ImageBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    product: Optional[Product] = Relationship(back_populates="images")
 
 
 class ImageCreate(ImageBase):
@@ -134,7 +135,7 @@ class ImageUpdate(SQLModel):
     data: Optional[str]
     url: Optional[str]
 
-    product_id: Optional[int] = Field(default=None, foreign_key="product.id")
+    product_id: Optional[int]
 
 # ------------------
 # ----- Client -----
@@ -159,6 +160,8 @@ class ClientBase(SQLModel):
 class Client(ClientBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
+
+   managers: List["CleintManager"] = Relationship(back_populates="client")
 
 
 class ClientCreate(ClientBase):
@@ -211,6 +214,7 @@ class ClientManager(ClientManagerBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
+    client: Optional[Client] = Relationship(back_populates="managers")
 
 class ClientManagerCreate(ClientManagerBase):
     pass
@@ -228,7 +232,7 @@ class ClientManagerUpdate(SQLModel):
     phone: Optional[str] = Field(unique=True, max_length=12)
     email: Optional[str] = Field(unique=True)
 
-    client_id: Optional[int] = Field(default=None, foreign_key="client.id")
+    client_id: Optional[int]
 
 # ------------------------
 # ----- Manufacturer -----
@@ -253,6 +257,9 @@ class ManufacturerBase(SQLModel):
 class Manufacturer(ManufacturerBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
+
+    products: List["Product"] = Relationship(back_populates="manufacturer")
+    managers: List["ManufacturerManager"] = Relationship(back_populates="manufacturer")
 
 
 class ManufacturerCreate(ManufacturerBase):
@@ -305,6 +312,8 @@ class ManufacturerManager(ManufacturerManagerBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
+    manufacturer: Optional[Manufacturer] = Relationship(back_populates="managers")
+
 
 class ManufacturerManagerCreate(ManufacturerManagerBase):
     pass
@@ -322,7 +331,7 @@ class ManufacturerManagerUpdate(SQLModel):
     phone: Optional[str] = Field(unique=True, max_length=12)
     email: Optional[str] = Field(unique=True)
 
-    manufacturer_id: Optional[int] = Field(default=None, foreign_key="manufacturer.id")
+    manufacturer_id: Optional[int]
 
 # -----------------
 # ----- Order -----
@@ -348,7 +357,7 @@ class OrderBase(SQLModel):
     status: OrderStatus
 
     client_id: Optional[int] = Field(default=None, foreign_key="client.id")
-    staff_id: Optional[int] = Field(default=None, foreign_key="staff.id")
+    staff_id: Optional[int] = Field(default=None, foreign_key="staffmanager.id")
     products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink)
 
 
@@ -356,6 +365,8 @@ class Order(OrderBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
+    staff_managers: Optional[StaffManager] = Relationship(back_populates="orders")
+    
 
 class OrderCreate(OrderBase):
     pass
@@ -372,7 +383,7 @@ class OrderUpdate(SQLModel):
     status: Optional[OrderStatus]
 
     client_id: Optional[int] = Field(default=None, foreign_key="client.id")
-    staff_id: Optional[int] = Field(default=None, foreign_key="staff.id")
+    staff_id: Optional[int]
     products: Optional[List["Product"]] = Relationship(back_populates="orders", link_model=OrderProductLink)
 
 # ----------------------------
@@ -391,13 +402,14 @@ class ReviewBase(SQLModel):
     text: str
 
     client_id: Optional[int] = Field(default=None, foreign_key="client.id")
-    order_id: Optional[int] = Field(default=None, foreign_key="order.id")
 
 
 class Review(ReviewBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     date_in: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
+    orders: List["Order"] = Relationship(back_populates="reviews")
+    
 
 class ReviewCreate(ReviewBase):
     pass
@@ -413,7 +425,6 @@ class ReviewUpdate(SQLModel):
     text: Optional[str]
 
     client_id: Optional[int] = Field(default=None, foreign_key="client.id")
-    order_id: Optional[int] = Field(default=None, foreign_key="order.id")
 
 # ------------------------
 # ----- StaffManager -----
@@ -450,6 +461,8 @@ class StaffBase(SQLModel):
 class Staff(StaffBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
+
+    orders: List["Order"] = Relationship(back_populates="staff_managers")
 
 
 class StaffCreate(StaffBase):
