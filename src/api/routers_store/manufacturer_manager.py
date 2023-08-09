@@ -4,8 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from db.db import get_session
-from models.store.manufacturer_manager import ManufacturerManagerRead, ManufacturerManagerCreate, \
-    ManufacturerManagerUpdate
+from models.store import ManufacturerManagerRead, ManufacturerManagerCreate, ManufacturerManagerUpdate
 from repositories.store import ManufacturerManagerRepository
 
 router = APIRouter(
