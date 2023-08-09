@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 
@@ -16,8 +17,8 @@ class SQLAlchemyRepository(AbstractRepository):
     def __init__(self, session):
         self.session = session
 
-    async def get_list(self, offset: int = 0, limit: int = Query(default=100, lte=100)):
-        stmt = select(Hero).offset(offset).limit(limit)
+    async def get_list(self, offset: int, limit: int):
+        stmt = select(self.model).offset(offset).limit(limit)
         res = await self.session.execute(stmt)
         res = [row[0] for row in res.all()]
         return res
@@ -35,8 +36,10 @@ class SQLAlchemyRepository(AbstractRepository):
             await self.session.commit()
             await self.session.refresh(res)
             return res
-        except ValueError as error:
-            raise HTTPException(status_code=200, detail=str(error))
+        except ValueError as e:
+            raise HTTPException(status_code=200, detail=str(e))
+        except IntegrityError as e:
+            raise HTTPException(status_code=200, detail=str(e.orig))
 
     async def edit_one(self, self_id: int, data):
         try:

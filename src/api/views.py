@@ -3,8 +3,7 @@
 # from views.sqladmin import ProductAdmin as view_product
 # from views.sqladmin import ImageAdmin as view_image
 from views.sqladmin import ManufacturerAdmin as view_manufacturer
-
-# from views.sqladmin import ManufacturerManagerAdmin as view_manufacturermanager
+from views.sqladmin import ManufacturerManagerAdmin as view_manufacturermanager
 # from views.sqladmin import ClientAdmin as view_client
 # from views.sqladmin import ClientManagerAdmin as view_clientmanager
 # from views.sqladmin import StaffManagerAdmin as view_staffmanager
@@ -17,7 +16,7 @@ all_views = [
     # view_product,
     # view_image,
     view_manufacturer,
-    # view_manufacturermanager,
+    view_manufacturermanager,
     # view_client,
     # view_clientmanager,
     # view_staffmanager,

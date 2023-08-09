@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session
 
 from db.db import get_session
@@ -14,8 +14,8 @@ router = APIRouter(
 
 
 @router.get('', response_model=List[ManufacturerManagerRead])
-async def get_list(session: Session = Depends(get_session)):
-    return await ManufacturerManagerRepository(session).get_list()
+async def get_list(offset: int = 0, limit: int = Query(default=100, lte=100), session: Session = Depends(get_session)):
+    return await ManufacturerManagerRepository(session).get_list(offset, limit)
 
 
 @router.get('/{manager_id}', response_model=ManufacturerManagerRead)
@@ -30,7 +30,7 @@ async def add_one(manager: ManufacturerManagerCreate, session: Session = Depends
 
 @router.patch('/{manager_id}', response_model=ManufacturerManagerRead)
 async def edit_one(manager_id: int, manager: ManufacturerManagerUpdate,
-                             session: Session = Depends(get_session)):
+                   session: Session = Depends(get_session)):
     return await ManufacturerManagerRepository(session).edit_one(manager_id, manager)
 
 
