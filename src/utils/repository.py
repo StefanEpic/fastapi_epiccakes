@@ -16,8 +16,8 @@ class SQLAlchemyRepository(AbstractRepository):
     def __init__(self, session):
         self.session = session
 
-    async def get_list(self):
-        stmt = select(self.model)
+    async def get_list(self, offset: int = 0, limit: int = Query(default=100, lte=100)):
+        stmt = select(Hero).offset(offset).limit(limit)
         res = await self.session.execute(stmt)
         res = [row[0] for row in res.all()]
         return res
