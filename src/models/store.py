@@ -63,15 +63,15 @@ class ProductBase(SQLModel):
     price: float
 
     manufacturer_id: Optional[int] = Field(default=None, foreign_key="manufacturer.id")
-    orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
 
 
 class Product(ProductBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
 
+    manufacturer: Optional[Manufacturer] = Relationship(back_populates="products")
     images: List["Image"] = Relationship(back_populates="product")
     categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink)
-    manufacturer: Optional[Manufacturer] = Relationship(back_populates="products")
+    orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
 
 
 class ProductCreate(ProductBase):
@@ -97,7 +97,6 @@ class ProductUpdate(SQLModel):
     price: Optional[float]
 
     manufacturer_id: Optional[int]
-    orders: Optional[List["Order"]] = Relationship(back_populates="products", link_model=OrderProductLink)
 
 # -------------------------------
 # ----- CategoryProductLink -----
@@ -161,7 +160,9 @@ class Client(ClientBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
-   managers: List["CleintManager"] = Relationship(back_populates="client")
+    managers: List["CleintManager"] = Relationship(back_populates="client")
+    reviews: List["Review"] = Relationship(back_populates="client")
+    orders: List["Order"] = Relationship(back_populates="client")
 
 
 class ClientCreate(ClientBase):
@@ -356,16 +357,17 @@ class OrderBase(SQLModel):
     payment_method: OrderPay
     status: OrderStatus
 
-    client_id: Optional[int] = Field(default=None, foreign_key="client.id")
     staff_id: Optional[int] = Field(default=None, foreign_key="staffmanager.id")
-    products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink)
-
+    client_id: Optional[int] = Field(default=None, foreign_key="client.id")
 
 class Order(OrderBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
     staff_managers: Optional[StaffManager] = Relationship(back_populates="orders")
+    reviews: Optional[Review] = Relationship(back_populates="orders")
+    client: Optional[Client] = Relationship(back_populates="orders")
+    products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink)
     
 
 class OrderCreate(OrderBase):
@@ -382,9 +384,8 @@ class OrderUpdate(SQLModel):
     payment_method: Optional[OrderPay]
     status: Optional[OrderStatus]
 
-    client_id: Optional[int] = Field(default=None, foreign_key="client.id")
     staff_id: Optional[int]
-    products: Optional[List["Product"]] = Relationship(back_populates="orders", link_model=OrderProductLink)
+    client_id: Optional[int]
 
 # ----------------------------
 # ----- OrderProductLink -----
@@ -402,13 +403,15 @@ class ReviewBase(SQLModel):
     text: str
 
     client_id: Optional[int] = Field(default=None, foreign_key="client.id")
+    order_id: Optional[int] = Field(default=None, foreign_key="order.id")
 
 
 class Review(ReviewBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     date_in: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
-
-    orders: List["Order"] = Relationship(back_populates="reviews")
+    
+    client: List["Client"] = Relationship(back_populates="reviews")
+    order: List["Order"] = Relationship(back_populates="reviews")
     
 
 class ReviewCreate(ReviewBase):
@@ -424,7 +427,8 @@ class ReviewUpdate(SQLModel):
     rating: Optional[int] = Field(default=0)
     text: Optional[str]
 
-    client_id: Optional[int] = Field(default=None, foreign_key="client.id")
+    client_id: Optional[int]
+    order_id: Optional[int]
 
 # ------------------------
 # ----- StaffManager -----
