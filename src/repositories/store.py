@@ -1,9 +1,17 @@
-from models.store import Category, Product, Image, Client, ClientManager, Manufacturer, ManufacturerManager, Order, Review
+from models.store import Category, Product, Image, Client, ClientManager, Manufacturer, ManufacturerManager, Order, Review, StaffManager
 from utils.repository import SQLAlchemyRepository
 
 
 class CategoryRepository(SQLAlchemyRepository):
     model = Category
+
+
+class ProductRepository(SQLAlchemyRepository):
+    model = Product
+
+
+class ImageRepository(SQLAlchemyRepository):
+    model = Image
 
 
 class ClientRepository(SQLAlchemyRepository):
@@ -12,10 +20,6 @@ class ClientRepository(SQLAlchemyRepository):
 
 class ClientManagerRepository(SQLAlchemyRepository):
     model = ClientManager
-
-
-class ImageRepository(SQLAlchemyRepository):
-    model = Image
 
 
 class ManufacturerRepository(SQLAlchemyRepository):
@@ -30,9 +34,10 @@ class OrderRepository(SQLAlchemyRepository):
     model = Order
 
 
-class ProductRepository(SQLAlchemyRepository):
-    model = Product
-
-
 class ReviewRepository(SQLAlchemyRepository):
     model = Review
+
+
+class StaffManagerRepository(SQLAlchemyRepository):
+    model = StaffManager
+    
