@@ -9,7 +9,7 @@ from repositories.store import ManufacturerRepository
 
 router = APIRouter(
     prefix="/manufacturers",
-    tags=["Manufacturer"],
+    tags=["Manufacturers"],
 )
 
 
