@@ -519,3 +519,7 @@ class StaffManagerUpdate(SQLModel):
     phone: Optional[str] = Field(unique=True, max_length=12)
     email: Optional[str] = Field(unique=True)
     job_title: Optional[JobTitle]
+
+
+class StaffManagerReadWithOrders(StaffManagerRead):
+    orders: List[OrderRead] = []
