@@ -1,12 +1,11 @@
 import os
-import shutil
 
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 from db.db import MEDIA_URL, SITE_URL
 from models.store import Category, Product, Image, Client, ClientManager, Manufacturer, ManufacturerManager, Order, \
-    Review, StaffManager
+    Review, StaffManager, CategoryProductLink
 from utils.repository import SQLAlchemyRepository
 
 
@@ -16,6 +15,25 @@ class CategoryRepository(SQLAlchemyRepository):
 
 class ProductRepository(SQLAlchemyRepository):
     model = Product
+
+    async def add_one(self, data):
+        try:
+            res = self.model.from_orm(data)
+
+            for cat_id in data.categories:
+                cat_res = await self.session.get(Category, cat_id)
+                if not cat_res:
+                    raise HTTPException(status_code=404, detail="Category with this id not found")
+                res.categories.append(cat_res)
+
+            self.session.add(res)
+            await self.session.commit()
+            await self.session.refresh(res)
+            return res
+        except ValueError as e:
+            raise HTTPException(status_code=200, detail=str(e))
+        except IntegrityError as e:
+            raise HTTPException(status_code=200, detail=str(e.orig))
 
 
 class ClientRepository(SQLAlchemyRepository):

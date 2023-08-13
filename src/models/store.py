@@ -1,6 +1,5 @@
 import enum
 import datetime
-import os
 
 from pydantic import condecimal
 from typing import Optional, List
@@ -8,10 +7,6 @@ from typing import Optional, List
 from sqlalchemy.orm import validates
 from sqlmodel import SQLModel, Field, Relationship
 
-from fastapi_storages import FileSystemStorage
-from fastapi_storages.integrations.sqlalchemy import ImageType
-
-from db.db import MEDIA_URL, SITE_URL
 from utils.validators import name_valid, phone_valid, email_valid
 
 
@@ -381,15 +376,15 @@ class Product(ProductBase, table=True):
 
     images: List["Image"] = Relationship(back_populates="product", sa_relationship_kwargs={'lazy': 'selectin'})
     manufacturer: Manufacturer = Relationship(back_populates="products")
-    categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink)
+    categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink, sa_relationship_kwargs={'lazy': 'selectin'})
     orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
 
-    def __str__(self):
-        return self.title
+    # def __str__(self):
+    #     return self.title
 
 
 class ProductCreate(ProductBase):
-    pass
+    categories: List[int]
 
 
 class ProductRead(ProductBase):
@@ -411,6 +406,7 @@ class ProductUpdate(SQLModel):
     price: Optional[float]
 
     manufacturer_id: Optional[int] = Field(foreign_key="manufacturer.id")
+    # categories: Optional[List["Category"]] = Relationship(back_populates="products", link_model=CategoryProductLink)
 
 
 # -----------------
@@ -437,7 +433,8 @@ class ImageRead(ImageBase):
     id: int
 
 
-class ProductReadWithImages(ProductRead):
+class ProductReadWithCategoriesAndImages(ProductRead):
+    categories: List[CategoryRead] = []
     images: List[ImageRead] = []
 
 
