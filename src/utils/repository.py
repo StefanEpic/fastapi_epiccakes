@@ -62,4 +62,4 @@ class SQLAlchemyRepository(AbstractRepository):
             raise HTTPException(status_code=404, detail="Not found")
         await self.session.delete(res)
         await self.session.commit()
-        return {"ok": True}
+        return {"result": "success"}

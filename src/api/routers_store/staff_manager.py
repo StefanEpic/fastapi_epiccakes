@@ -8,7 +8,7 @@ from models.store import StaffManagerRead, StaffManagerCreate, StaffManagerUpdat
 from repositories.store import StaffManagerRepository
 
 router = APIRouter(
-    prefix="/staffmanagers",
+    prefix="/staff_managers",
     tags=["Staff Managers"],
 )
 

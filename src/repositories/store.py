@@ -1,4 +1,12 @@
-from models.store import Category, Product, Image, Client, ClientManager, Manufacturer, ManufacturerManager, Order, Review, StaffManager
+import os
+import shutil
+
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+
+from db.db import MEDIA_URL, SITE_URL
+from models.store import Category, Product, Image, Client, ClientManager, Manufacturer, ManufacturerManager, Order, \
+    Review, StaffManager
 from utils.repository import SQLAlchemyRepository
 
 
@@ -8,10 +16,6 @@ class CategoryRepository(SQLAlchemyRepository):
 
 class ProductRepository(SQLAlchemyRepository):
     model = Product
-
-
-class ImageRepository(SQLAlchemyRepository):
-    model = Image
 
 
 class ClientRepository(SQLAlchemyRepository):
@@ -41,3 +45,37 @@ class ReviewRepository(SQLAlchemyRepository):
 class StaffManagerRepository(SQLAlchemyRepository):
     model = StaffManager
 
+
+class ImageRepository(SQLAlchemyRepository):
+    model = Image
+
+    async def add_one(self, product_id, image):
+        try:
+            p_id = await self.session.get(Product, product_id)
+            if not p_id:
+                raise HTTPException(status_code=404, detail="Product with this id not found")
+
+            contents = await image.read()
+            filepath = f'{MEDIA_URL}/{image.filename}'
+            url = SITE_URL + '/media/' + image.filename
+            res = Image(title=image.filename, path=filepath, product_id=product_id, url=url)
+            self.session.add(res)
+            await self.session.commit()
+            await self.session.refresh(res)
+
+            with open(filepath, "wb") as f:
+                f.write(contents)
+            return res
+        except ValueError as e:
+            raise HTTPException(status_code=200, detail=str(e))
+        except IntegrityError as e:
+            raise HTTPException(status_code=200, detail=str(e.orig))
+
+    async def delete_one(self, self_id: int):
+        res = await self.session.get(self.model, self_id)
+        if not res:
+            raise HTTPException(status_code=404, detail="Not found")
+        os.remove(res.path)
+        await self.session.delete(res)
+        await self.session.commit()
+        return {"result": "success"}

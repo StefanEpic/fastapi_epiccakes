@@ -1,10 +1,10 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlmodel import Session
 
 from db.db import get_session
-from models.store import ClientManagerRead, ClientManagerCreate, ClientManagerUpdate
+from models.store import ClientManagerRead, ClientManagerCreate, ClientManagerUpdate, Client
 from repositories.store import ClientManagerRepository
 
 router = APIRouter(
@@ -25,6 +25,9 @@ async def get_one(manager_id: int, session: Session = Depends(get_session)):
 
 @router.post('', response_model=ClientManagerRead)
 async def add_one(manager: ClientManagerCreate, session: Session = Depends(get_session)):
+    res = await session.get(Client, manager.client_id)
+    if not res:
+        raise HTTPException(status_code=404, detail="Client with this id not found")
     return await ClientManagerRepository(session).add_one(manager)
 
 

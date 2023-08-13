@@ -1,5 +1,6 @@
 import enum
 import datetime
+import os
 
 from pydantic import condecimal
 from typing import Optional, List
@@ -7,8 +8,11 @@ from typing import Optional, List
 from sqlalchemy.orm import validates
 from sqlmodel import SQLModel, Field, Relationship
 
-from utils.validators import name_valid, phone_valid, email_valid
+from fastapi_storages import FileSystemStorage
+from fastapi_storages.integrations.sqlalchemy import ImageType
 
+from db.db import MEDIA_URL, SITE_URL
+from utils.validators import name_valid, phone_valid, email_valid
 
 
 # -------------------------------
@@ -41,6 +45,9 @@ class Category(CategoryBase, table=True):
 
     products: List["Product"] = Relationship(back_populates="categories", link_model=CategoryProductLink)
 
+    def __str__(self):
+        return self.title
+
 
 class CategoryCreate(CategoryBase):
     pass
@@ -53,107 +60,6 @@ class CategoryRead(CategoryBase):
 class CategoryUpdate(SQLModel):
     title: Optional[str] = Field(unique=True)
     description: Optional[str]
-
-
-# -------------------
-# ----- Product -----
-# -------------------
-class ProductType(enum.Enum):
-    biscuit = "Бисквитные"
-    sandy = "Песочные"
-    puff = "Слоеные"
-    waffle = "Вафельные"
-    air = "Воздушные"
-    tiny = "Крошковые"
-    custards = "Заварные"
-
-
-class ProductBase(SQLModel):
-    title: str = Field(unique=True)
-    type: ProductType
-    weight: Optional[int]
-    best_before_date: Optional[int]
-    storage_temperature: Optional[int]
-    proteins: Optional[int]
-    fats: Optional[int]
-    carbohydrates: Optional[int]
-    energy_value: Optional[int]
-    description: Optional[str]
-    # price: condecimal(max_digits=8, decimal_places=2) = Field(default=0)
-    price: float
-
-     manufacturer_id: int = Field(foreign_key="manufacturer.id")
-
-
-class Product(ProductBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-
-    images: List["Image"] = Relationship(back_populates="product", sa_relationship_kwargs={'lazy': 'selectin'})
-    manufacturer: Manufacturer = Relationship(back_populates="products")
-    categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink)
-    orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
-
-
-class ProductCreate(ProductBase):
-    pass
-
-
-class ProductRead(ProductBase):
-    id: int
-
-
-class ProductUpdate(SQLModel):
-    title: Optional[str] = Field(unique=True)
-    type: Optional[ProductType]
-    weight: Optional[int]
-    best_before_date: Optional[int]
-    storage_temperature: Optional[int]
-    proteins: Optional[int]
-    fats: Optional[int]
-    carbohydrates: Optional[int]
-    energy_value: Optional[int]
-    description: Optional[str]
-    # price: Optional[condecimal]
-    price: Optional[float]
-
-    manufacturer_id: Optional[int] = Field(foreign_key="manufacturer.id")
-
-
-# -----------------
-# ----- Image -----
-# -----------------
-class ImageBase(SQLModel):
-    title: str
-    data: str
-    url: str
-
-    product_id: int = Field(foreign_key="product.id")
-
-
-class Image(ImageBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-
-    product: Product = Relationship(back_populates="images")
-
-
-class ImageCreate(ImageBase):
-    pass
-
-
-class ImageRead(ImageBase):
-    id: int
-
-
-class ImageUpdate(SQLModel):
-    title: Optional[str]
-    data: Optional[str]
-    url: Optional[str]
-
-    image_id: Optional[int] = Field(foreign_key="product.id")
-
-
-class ProductReadWithImages(ProductRead):
-    images: List[ImageRead] = []
 
 
 # ------------------
@@ -183,6 +89,9 @@ class Client(ClientBase, table=True):
     managers: List["ClientManager"] = Relationship(back_populates="client", sa_relationship_kwargs={'lazy': 'selectin'})
     orders: List["Order"] = Relationship(back_populates="client", sa_relationship_kwargs={'lazy': 'selectin'})
     reviews: List["Review"] = Relationship(back_populates="client", sa_relationship_kwargs={'lazy': 'selectin'})
+
+    def __str__(self):
+        return self.title
 
 
 class ClientCreate(ClientBase):
@@ -238,6 +147,9 @@ class ClientManager(ClientManagerBase, table=True):
 
     client: Client = Relationship(back_populates="managers")
 
+    def __str__(self):
+        return f'{self.second_name} {self.first_name[0]}. {self.last_name[0]}.'
+
 
 class ClientManagerCreate(ClientManagerBase):
     pass
@@ -286,7 +198,8 @@ class Manufacturer(ManufacturerBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
-    managers: List["ManufacturerManager"] = Relationship(back_populates="manufacturer", sa_relationship_kwargs={'lazy': 'selectin'})
+    managers: List["ManufacturerManager"] = Relationship(back_populates="manufacturer",
+                                                         sa_relationship_kwargs={'lazy': 'selectin'})
     products: List["Product"] = Relationship(back_populates="manufacturer", sa_relationship_kwargs={'lazy': 'selectin'})
 
     def __str__(self):
@@ -373,97 +286,6 @@ class ManufacturerReadWithManagers(ManufacturerRead):
     managers: List[ManufacturerManagerRead] = []
 
 
-# -----------------
-# ----- Order -----
-# -----------------
-class OrderDelivery(enum.Enum):
-    delivery = "Доставка"
-    pickup = "Самовывоз"
-
-
-class OrderPay(enum.Enum):
-    cash = "Наличными"
-    card = "Банковской картой"
-
-
-class OrderStatus(enum.Enum):
-    processing = "В работе"
-    done = "Выполнено"
-
-
-class OrderBase(SQLModel):
-    delivery_method: OrderDelivery
-    payment_method: OrderPay
-    status: OrderStatus
-
-   staffmanager_id: int = Field(foreign_key="staffmanager.id")
-   client_id: int = Field(foreign_key="client.id")
-
-
-class Order(OrderBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
-
-    staffmanagers: StaffManager = Relationship(back_populates="orders")
-    reviews: List["Review"] = Relationship(back_populates="order", sa_relationship_kwargs={'lazy': 'selectin'})
-    client: Client = Relationship(back_populates="orders")
-    products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink)
-
-
-class OrderCreate(OrderBase):
-    pass
-
-
-class OrderRead(OrderBase):
-    id: int
-    date: datetime.datetime
-
-
-class OrderUpdate(SQLModel):
-    delivery_method: Optional[OrderDelivery]
-    payment_method: Optional[OrderPay]
-    status: Optional[OrderStatus]
-
-    staffmanager_id: Optional[int] = Field(foreign_key="staffmanager.id")
-    client_id: Optional[int] = Field(foreign_key="client.id")
-
-
-# ------------------
-# ----- Review -----
-# ------------------
-class ReviewBase(SQLModel):
-    rating: int = Field(default=0)
-    text: str
-
-    order_id: int = Field(foreign_key="order.id")
-    client_id: int = Field(foreign_key="client.id")
-
-
-class Review(ReviewBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    date_in: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
-
-    order: Order = Relationship(back_populates="reviews")
-    client: Client = Relationship(back_populates="reviews")
-
-
-class ReviewCreate(ReviewBase):
-    pass
-
-
-class ReviewRead(ReviewBase):
-    id: int
-    date_in: datetime.datetime
-
-
-class ReviewUpdate(SQLModel):
-    rating: Optional[int] = Field(default=0)
-    text: Optional[str]
-
-    order_id: Optional[int] = Field(foreign_key="order.id")
-    client_id: Optional[int] = Field(foreign_key="client.id")
-
-
 # ------------------------
 # ----- StaffManager -----
 # ------------------------
@@ -502,6 +324,9 @@ class StaffManager(StaffManagerBase, table=True):
 
     orders: List["Order"] = Relationship(back_populates="staffmanagers", sa_relationship_kwargs={'lazy': 'selectin'})
 
+    def __str__(self):
+        return f'{self.second_name} {self.first_name[0]}. {self.last_name[0]}.'
+
 
 class StaffManagerCreate(StaffManagerBase):
     pass
@@ -521,5 +346,191 @@ class StaffManagerUpdate(SQLModel):
     job_title: Optional[JobTitle]
 
 
+# -------------------
+# ----- Product -----
+# -------------------
+class ProductType(enum.Enum):
+    biscuit = "Бисквитные"
+    sandy = "Песочные"
+    puff = "Слоеные"
+    waffle = "Вафельные"
+    air = "Воздушные"
+    tiny = "Крошковые"
+    custards = "Заварные"
+
+
+class ProductBase(SQLModel):
+    title: str = Field(unique=True)
+    type: ProductType
+    weight: Optional[int]
+    best_before_date: Optional[int]
+    storage_temperature: Optional[int]
+    proteins: Optional[int]
+    fats: Optional[int]
+    carbohydrates: Optional[int]
+    energy_value: Optional[int]
+    description: Optional[str]
+    # price: condecimal(max_digits=8, decimal_places=2) = Field(default=0)
+    price: float
+
+    manufacturer_id: int = Field(foreign_key="manufacturer.id")
+
+
+class Product(ProductBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    images: List["Image"] = Relationship(back_populates="product", sa_relationship_kwargs={'lazy': 'selectin'})
+    manufacturer: Manufacturer = Relationship(back_populates="products")
+    categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink)
+    orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
+
+    def __str__(self):
+        return self.title
+
+
+class ProductCreate(ProductBase):
+    pass
+
+
+class ProductRead(ProductBase):
+    id: int
+
+
+class ProductUpdate(SQLModel):
+    title: Optional[str] = Field(unique=True)
+    type: Optional[ProductType]
+    weight: Optional[int]
+    best_before_date: Optional[int]
+    storage_temperature: Optional[int]
+    proteins: Optional[int]
+    fats: Optional[int]
+    carbohydrates: Optional[int]
+    energy_value: Optional[int]
+    description: Optional[str]
+    # price: Optional[condecimal]
+    price: Optional[float]
+
+    manufacturer_id: Optional[int] = Field(foreign_key="manufacturer.id")
+
+
+# -----------------
+# ----- Image -----
+# -----------------
+class ImageBase(SQLModel):
+    title: str = Field(unique=True)
+    url: str
+
+    product_id: int = Field(foreign_key="product.id")
+
+
+class Image(ImageBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    path: str
+    product: Product = Relationship(back_populates="images")
+
+    def __str__(self):
+        return self.title
+
+
+class ImageRead(ImageBase):
+    id: int
+
+
+class ProductReadWithImages(ProductRead):
+    images: List[ImageRead] = []
+
+
+# -----------------
+# ----- Order -----
+# -----------------
+class OrderDelivery(enum.Enum):
+    delivery = "Доставка"
+    pickup = "Самовывоз"
+
+
+class OrderPay(enum.Enum):
+    cash = "Наличными"
+    card = "Банковской картой"
+
+
+class OrderStatus(enum.Enum):
+    processing = "В работе"
+    done = "Выполнено"
+
+
+class OrderBase(SQLModel):
+    delivery_method: OrderDelivery
+    payment_method: OrderPay
+    status: OrderStatus
+
+    staffmanager_id: int = Field(foreign_key="staffmanager.id")
+    client_id: int = Field(foreign_key="client.id")
+
+
+class Order(OrderBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
+
+    staffmanagers: StaffManager = Relationship(back_populates="orders")
+    reviews: List["Review"] = Relationship(back_populates="order", sa_relationship_kwargs={'lazy': 'selectin'})
+    client: Client = Relationship(back_populates="orders")
+    products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink)
+
+
+class OrderCreate(OrderBase):
+    pass
+
+
+class OrderRead(OrderBase):
+    id: int
+    date: datetime.datetime
+
+
+class OrderUpdate(SQLModel):
+    delivery_method: Optional[OrderDelivery]
+    payment_method: Optional[OrderPay]
+    status: Optional[OrderStatus]
+
+    staffmanager_id: Optional[int] = Field(foreign_key="staffmanager.id")
+    client_id: Optional[int] = Field(foreign_key="client.id")
+
+
 class StaffManagerReadWithOrders(StaffManagerRead):
     orders: List[OrderRead] = []
+
+
+# ------------------
+# ----- Review -----
+# ------------------
+class ReviewBase(SQLModel):
+    rating: int = Field(default=0)
+    text: str
+
+    order_id: int = Field(foreign_key="order.id")
+    client_id: int = Field(foreign_key="client.id")
+
+
+class Review(ReviewBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    date_in: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
+
+    order: Order = Relationship(back_populates="reviews")
+    client: Client = Relationship(back_populates="reviews")
+
+
+class ReviewCreate(ReviewBase):
+    pass
+
+
+class ReviewRead(ReviewBase):
+    id: int
+    date_in: datetime.datetime
+
+
+class ReviewUpdate(SQLModel):
+    rating: Optional[int] = Field(default=0)
+    text: Optional[str]
+
+    order_id: Optional[int] = Field(foreign_key="order.id")
+    client_id: Optional[int] = Field(foreign_key="client.id")
