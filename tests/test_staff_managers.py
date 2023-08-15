@@ -108,6 +108,13 @@ async def test_edit_one_manager(ac: AsyncClient):
     assert response.json()["id"] == 2
 
 
+async def test_edit_one_manager_invalid_name(ac: AsyncClient):
+    response = await ac.patch("/staff_managers/2", json={"first_name": "Виктор777"})
+
+    assert response.status_code == 200
+    assert response.json()["detail"] == "Error. Invalid value for name field"
+
+
 async def test_delete_one_manager(ac: AsyncClient):
     response = await ac.delete("/staff_managers/2")
 

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlmodel import Session
 
 from db.db import get_session
-from models.store import ProductCreate, ProductUpdate, Manufacturer, ProductReadWithCategoriesAndImages, Category
+from models.store import ProductCreate, ProductUpdate, Manufacturer, ProductReadWithCategoriesAndImages
 from repositories.store import ProductRepository
 
 router = APIRouter(
@@ -34,6 +34,10 @@ async def add_one(product: ProductCreate, session: Session = Depends(get_session
 @router.patch('/{product_id}', response_model=ProductReadWithCategoriesAndImages)
 async def edit_one(product_id: int, product: ProductUpdate,
                    session: Session = Depends(get_session)):
+    if product.manufacturer_id:
+        res = await session.get(Manufacturer, product.manufacturer_id)
+        if not res:
+            raise HTTPException(status_code=404, detail="Manufacturer with this id not found")
     return await ProductRepository(session).edit_one(product_id, product)
 
 

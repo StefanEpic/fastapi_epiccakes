@@ -2,7 +2,7 @@ import enum
 import datetime
 
 from pydantic import condecimal
-from typing import Optional, List
+from typing import Optional, List, Dict, Tuple
 
 from sqlalchemy.orm import validates
 from sqlmodel import SQLModel, Field, Relationship
@@ -24,7 +24,7 @@ class CategoryProductLink(SQLModel, table=True):
 class OrderProductLink(SQLModel, table=True):
     order_id: Optional[int] = Field(default=None, foreign_key="order.id", primary_key=True)
     product_id: Optional[int] = Field(default=None, foreign_key="product.id", primary_key=True)
-    amount: int
+    quantity: int
 
 
 # --------------------
@@ -58,14 +58,14 @@ class CategoryUpdate(SQLModel):
 
 
 # ------------------
-# ----- Client -----
+# ----- Customer -----
 # ------------------
-class ClientStatus(enum.Enum):
+class CustomerStatus(enum.Enum):
     active = "Действующий"
     inactive = "Недействующий"
 
 
-class ClientBase(SQLModel):
+class CustomerBase(SQLModel):
     title: str = Field(unique=True)
     description: Optional[str]
     city: str
@@ -74,31 +74,31 @@ class ClientBase(SQLModel):
     office: Optional[str]
     metro_station: Optional[str]
     website: Optional[str]
-    status: ClientStatus
+    status: CustomerStatus
 
 
-class Client(ClientBase, table=True):
+class Customer(CustomerBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
-    managers: List["ClientManager"] = Relationship(back_populates="client", sa_relationship_kwargs={'lazy': 'selectin'})
-    orders: List["Order"] = Relationship(back_populates="client", sa_relationship_kwargs={'lazy': 'selectin'})
-    reviews: List["Review"] = Relationship(back_populates="client", sa_relationship_kwargs={'lazy': 'selectin'})
+    managers: List["CustomerManager"] = Relationship(back_populates="customer", sa_relationship_kwargs={'lazy': 'selectin'})
+    orders: List["Order"] = Relationship(back_populates="customer", sa_relationship_kwargs={'lazy': 'selectin'})
+    reviews: List["Review"] = Relationship(back_populates="customer", sa_relationship_kwargs={'lazy': 'selectin'})
 
     def __str__(self):
         return self.title
 
 
-class ClientCreate(ClientBase):
+class CustomerCreate(CustomerBase):
     pass
 
 
-class ClientRead(ClientBase):
+class CustomerRead(CustomerBase):
     id: int
     registration_date: datetime.datetime
 
 
-class ClientUpdate(SQLModel):
+class CustomerUpdate(SQLModel):
     title: Optional[str] = Field(unique=True)
     description: Optional[str]
     city: Optional[str]
@@ -107,20 +107,20 @@ class ClientUpdate(SQLModel):
     office: Optional[str]
     metro_station: Optional[str]
     website: Optional[str]
-    status: Optional[ClientStatus]
+    status: Optional[CustomerStatus]
 
 
 # -------------------------
-# ----- ClientManager -----
+# ----- CustomerManager -----
 # -------------------------
-class ClientManagerBase(SQLModel):
+class CustomerManagerBase(SQLModel):
     first_name: str
     second_name: str
     last_name: str
     phone: str = Field(unique=True, max_length=12)
     email: str = Field(unique=True)
 
-    client_id: int = Field(foreign_key="client.id")
+    customer_id: int = Field(foreign_key="customer.id")
 
     @validates("first_name", "second_name", "last_name")
     def validate_name(self, key, *names):
@@ -136,37 +136,37 @@ class ClientManagerBase(SQLModel):
         return email_valid(email)
 
 
-class ClientManager(ClientManagerBase, table=True):
+class CustomerManager(CustomerManagerBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
-    client: Client = Relationship(back_populates="managers")
+    customer: Customer = Relationship(back_populates="managers")
 
     def __str__(self):
         return f'{self.second_name} {self.first_name[0]}. {self.last_name[0]}.'
 
 
-class ClientManagerCreate(ClientManagerBase):
+class CustomerManagerCreate(CustomerManagerBase):
     pass
 
 
-class ClientManagerRead(ClientManagerBase):
+class CustomerManagerRead(CustomerManagerBase):
     id: int
     registration_date: datetime.datetime
 
 
-class ClientManagerUpdate(SQLModel):
+class CustomerManagerUpdate(SQLModel):
     first_name: Optional[str]
     second_name: Optional[str]
     last_name: Optional[str]
     phone: Optional[str] = Field(unique=True, max_length=12)
     email: Optional[str] = Field(unique=True)
 
-    client_id: Optional[int] = Field(foreign_key="client.id")
+    customer_id: Optional[int] = Field(foreign_key="customer.id")
 
 
-class ClientReadWithManagers(ClientRead):
-    managers: List[ClientManagerRead] = []
+class CustomerReadWithManagers(CustomerRead):
+    managers: List[CustomerManagerRead] = []
 
 
 # ------------------------
@@ -376,7 +376,8 @@ class Product(ProductBase, table=True):
 
     images: List["Image"] = Relationship(back_populates="product", sa_relationship_kwargs={'lazy': 'selectin'})
     manufacturer: Manufacturer = Relationship(back_populates="products")
-    categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink, sa_relationship_kwargs={'lazy': 'selectin'})
+    categories: List["Category"] = Relationship(back_populates="products", link_model=CategoryProductLink,
+                                                sa_relationship_kwargs={'lazy': 'selectin'})
     orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
 
     # def __str__(self):
@@ -406,7 +407,7 @@ class ProductUpdate(SQLModel):
     price: Optional[float]
 
     manufacturer_id: Optional[int] = Field(foreign_key="manufacturer.id")
-    # categories: Optional[List["Category"]] = Relationship(back_populates="products", link_model=CategoryProductLink)
+    categories: Optional[List[int]]
 
 
 # -----------------
@@ -462,26 +463,29 @@ class OrderBase(SQLModel):
     status: OrderStatus
 
     staffmanager_id: int = Field(foreign_key="staffmanager.id")
-    client_id: int = Field(foreign_key="client.id")
+    customer_id: int = Field(foreign_key="customer.id")
 
 
 class Order(OrderBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
+    sum_price: float = Field(default=0)
 
     staffmanagers: StaffManager = Relationship(back_populates="orders")
     reviews: List["Review"] = Relationship(back_populates="order", sa_relationship_kwargs={'lazy': 'selectin'})
-    client: Client = Relationship(back_populates="orders")
-    products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink)
+    customer: Customer = Relationship(back_populates="orders")
+    products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink,
+                                             sa_relationship_kwargs={'lazy': 'selectin'})
 
 
 class OrderCreate(OrderBase):
-    pass
+    products: Dict[int, int]
 
 
 class OrderRead(OrderBase):
     id: int
     date: datetime.datetime
+    sum_price: float
 
 
 class OrderUpdate(SQLModel):
@@ -490,7 +494,12 @@ class OrderUpdate(SQLModel):
     status: Optional[OrderStatus]
 
     staffmanager_id: Optional[int] = Field(foreign_key="staffmanager.id")
-    client_id: Optional[int] = Field(foreign_key="client.id")
+    customer_id: Optional[int] = Field(foreign_key="customer.id")
+    products: Optional[Dict[int, int]]
+
+
+class OrderReadWithProducts(OrderRead):
+    products: List[ProductRead] = []
 
 
 class StaffManagerReadWithOrders(StaffManagerRead):
@@ -505,7 +514,7 @@ class ReviewBase(SQLModel):
     text: str
 
     order_id: int = Field(foreign_key="order.id")
-    client_id: int = Field(foreign_key="client.id")
+    Customer_id: int = Field(foreign_key="customer.id")
 
 
 class Review(ReviewBase, table=True):
@@ -513,7 +522,7 @@ class Review(ReviewBase, table=True):
     date_in: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
     order: Order = Relationship(back_populates="reviews")
-    client: Client = Relationship(back_populates="reviews")
+    customer: Customer = Relationship(back_populates="reviews")
 
 
 class ReviewCreate(ReviewBase):
@@ -530,4 +539,4 @@ class ReviewUpdate(SQLModel):
     text: Optional[str]
 
     order_id: Optional[int] = Field(foreign_key="order.id")
-    client_id: Optional[int] = Field(foreign_key="client.id")
+    customer_id: Optional[int] = Field(foreign_key="customer.id")

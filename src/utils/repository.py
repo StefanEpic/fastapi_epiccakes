@@ -53,8 +53,8 @@ class SQLAlchemyRepository(AbstractRepository):
             await self.session.commit()
             await self.session.refresh(res)
             return res
-        except ValueError as error:
-            raise HTTPException(status_code=200, detail=str(error))
+        except ValueError as e:
+            raise HTTPException(status_code=200, detail=str(e))
 
     async def delete_one(self, self_id: int):
         res = await self.session.get(self.model, self_id)

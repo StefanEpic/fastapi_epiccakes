@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 862cd0525a72
+Revision ID: 900ad46b1194
 Revises: 
-Create Date: 2023-08-13 11:38:14.334197
+Create Date: 2023-08-15 19:09:57.943584
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision = '862cd0525a72'
+revision = '900ad46b1194'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,7 +26,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('title')
     )
-    op.create_table('client',
+    op.create_table('customer',
     sa.Column('title', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('city', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
@@ -35,7 +35,7 @@ def upgrade():
     sa.Column('office', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('metro_station', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('website', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('status', sa.Enum('active', 'inactive', name='clientstatus'), nullable=False),
+    sa.Column('status', sa.Enum('active', 'inactive', name='customerstatus'), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('registration_date', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
@@ -69,16 +69,16 @@ def upgrade():
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('phone')
     )
-    op.create_table('clientmanager',
+    op.create_table('customermanager',
     sa.Column('first_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('second_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('last_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('phone', sqlmodel.sql.sqltypes.AutoString(length=12), nullable=False),
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('client_id', sa.Integer(), nullable=False),
+    sa.Column('Customer_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('registration_date', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
+    sa.ForeignKeyConstraint(['Customer_id'], ['customer.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('phone')
@@ -102,10 +102,11 @@ def upgrade():
     sa.Column('payment_method', sa.Enum('cash', 'card', name='orderpay'), nullable=False),
     sa.Column('status', sa.Enum('processing', 'done', name='orderstatus'), nullable=False),
     sa.Column('staffmanager_id', sa.Integer(), nullable=False),
-    sa.Column('client_id', sa.Integer(), nullable=False),
+    sa.Column('Customer_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
+    sa.Column('sum_price', sa.Float(), nullable=False),
+    sa.ForeignKeyConstraint(['Customer_id'], ['customer.id'], ),
     sa.ForeignKeyConstraint(['staffmanager_id'], ['staffmanager.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -136,10 +137,10 @@ def upgrade():
     )
     op.create_table('image',
     sa.Column('title', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('path', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('url', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('url', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('path', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('title')
@@ -147,7 +148,7 @@ def upgrade():
     op.create_table('orderproductlink',
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
-    sa.Column('amount', sa.Integer(), nullable=False),
+    sa.Column('quantity', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
     sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
     sa.PrimaryKeyConstraint('order_id', 'product_id')
@@ -156,10 +157,10 @@ def upgrade():
     sa.Column('rating', sa.Integer(), nullable=False),
     sa.Column('text', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
-    sa.Column('client_id', sa.Integer(), nullable=False),
+    sa.Column('Customer_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('date_in', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
+    sa.ForeignKeyConstraint(['Customer_id'], ['customer.id'], ),
     sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -175,9 +176,9 @@ def downgrade():
     op.drop_table('product')
     op.drop_table('order')
     op.drop_table('manufacturermanager')
-    op.drop_table('clientmanager')
+    op.drop_table('customermanager')
     op.drop_table('staffmanager')
     op.drop_table('manufacturer')
-    op.drop_table('client')
+    op.drop_table('customer')
     op.drop_table('category')
     # ### end Alembic commands ###

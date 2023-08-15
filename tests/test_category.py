@@ -7,7 +7,7 @@ async def test_add_one_category(ac: AsyncClient):
     })
 
     assert response.status_code == 200
-    assert response.json()["id"] == 2
+    assert response.json()["id"] == 4
 
 
 async def test_add_one_category_invalid_title_unique(ac: AsyncClient):
@@ -23,27 +23,27 @@ async def test_get_list_categories(ac: AsyncClient):
     response = await ac.get("/categories")
 
     assert response.status_code == 200
-    assert response.json()[1]["id"] == 2
-    assert len(response.json()) == 2
+    assert response.json()[3]["id"] == 4
+    assert len(response.json()) == 4
 
 
 async def test_get_one_category(ac: AsyncClient):
-    response = await ac.get("/categories/2")
+    response = await ac.get("/categories/4")
 
     assert response.status_code == 200
-    assert response.json()["id"] == 2
+    assert response.json()["id"] == 4
 
 
 async def test_edit_one_category(ac: AsyncClient):
-    response = await ac.patch("/categories/2", json={"title": "Шоколадные"})
+    response = await ac.patch("/categories/4", json={"title": "Шоколадные"})
 
     assert response.status_code == 200
     assert response.json()["title"] == "Шоколадные"
-    assert response.json()["id"] == 2
+    assert response.json()["id"] == 4
 
 
 async def test_delete_one_category(ac: AsyncClient):
-    response = await ac.delete("/categories/2")
+    response = await ac.delete("/categories/4")
 
     assert response.status_code == 200
     assert response.json()["result"] == "success"

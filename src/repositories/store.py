@@ -4,8 +4,8 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 from db.db import MEDIA_URL, SITE_URL
-from models.store import Category, Product, Image, Client, ClientManager, Manufacturer, ManufacturerManager, Order, \
-    Review, StaffManager, CategoryProductLink
+from models.store import Category, Product, Image, Customer, CustomerManager, Manufacturer, ManufacturerManager, Order, \
+    Review, StaffManager, OrderProductLink
 from utils.repository import SQLAlchemyRepository
 
 
@@ -35,13 +35,41 @@ class ProductRepository(SQLAlchemyRepository):
         except IntegrityError as e:
             raise HTTPException(status_code=200, detail=str(e.orig))
 
+    async def edit_one(self, self_id: int, data):
+        try:
+            res = await self.session.get(self.model, self_id)
+            if not res:
+                raise HTTPException(status_code=404, detail="Not found")
+            categories = data.categories
+            data.categories = []
+            res_data = data.dict(exclude_unset=True)
 
-class ClientRepository(SQLAlchemyRepository):
-    model = Client
+            for key, value in res_data.items():
+                setattr(res, key, value)
+
+            if categories:
+                for cat_id in categories:
+                    cat_res = await self.session.get(Category, cat_id)
+                    if not cat_res:
+                        raise HTTPException(status_code=404, detail="Category with this id not found")
+                    res.categories.append(cat_res)
+
+            self.session.add(res)
+            await self.session.commit()
+            await self.session.refresh(res)
+            return res
+        except ValueError as e:
+            raise HTTPException(status_code=200, detail=str(e))
+        except IntegrityError as e:
+            raise HTTPException(status_code=200, detail=str(e.orig))
 
 
-class ClientManagerRepository(SQLAlchemyRepository):
-    model = ClientManager
+class CustomerRepository(SQLAlchemyRepository):
+    model = Customer
+
+
+class CustomerManagerRepository(SQLAlchemyRepository):
+    model = CustomerManager
 
 
 class ManufacturerRepository(SQLAlchemyRepository):
@@ -54,6 +82,68 @@ class ManufacturerManagerRepository(SQLAlchemyRepository):
 
 class OrderRepository(SQLAlchemyRepository):
     model = Order
+
+    async def add_one(self, data):
+        try:
+            for product in data.products:
+                prod_res = await self.session.get(Product, product)
+                if not prod_res:
+                    raise HTTPException(status_code=404, detail="Product with this id not found")
+
+            res = self.model.from_orm(data)
+            self.session.add(res)
+            await self.session.commit()
+
+            res.sum_price = 0
+            for product in data.products:
+                prod_res = await self.session.get(Product, product)
+                quantity = data.products[product]
+                order_res = OrderProductLink(order_id=res.id, product_id=product, quantity=quantity)
+                self.session.add(order_res)
+                res.sum_price += quantity * prod_res.price
+
+            await self.session.commit()
+            await self.session.refresh(res)
+            return res
+        except ValueError as e:
+            raise HTTPException(status_code=200, detail=str(e))
+        except IntegrityError as e:
+            raise HTTPException(status_code=200, detail=str(e.orig))
+
+    async def edit_one(self, self_id: int, data):
+        try:
+            res = await self.session.get(self.model, self_id)
+            if not res:
+                raise HTTPException(status_code=404, detail="Not found")
+            products = data.products
+            data.products = []
+            res_data = data.dict(exclude_unset=True)
+
+            for key, value in res_data.items():
+                setattr(res, key, value)
+
+            self.session.add(res)
+            await self.session.commit()
+
+            if products:
+                res.sum_price = 0
+                for product in products:
+                    prod_res = await self.session.get(Product, product)
+                    if not prod_res:
+                        raise HTTPException(status_code=404, detail="Product with this id not found")
+                    quantity = products[product]
+                    order_res = OrderProductLink(order_id=res.id, product_id=product, quantity=quantity)
+                    self.session.add(order_res)
+                    res.sum_price += quantity * prod_res.price
+
+            self.session.add(res)
+            await self.session.commit()
+            await self.session.refresh(res)
+            return res
+        except ValueError as e:
+            raise HTTPException(status_code=200, detail=str(e))
+        except IntegrityError as e:
+            raise HTTPException(status_code=200, detail=str(e.orig))
 
 
 class ReviewRepository(SQLAlchemyRepository):
@@ -69,10 +159,6 @@ class ImageRepository(SQLAlchemyRepository):
 
     async def add_one(self, product_id, image):
         try:
-            p_id = await self.session.get(Product, product_id)
-            if not p_id:
-                raise HTTPException(status_code=404, detail="Product with this id not found")
-
             contents = await image.read()
             filepath = f'{MEDIA_URL}/{image.filename}'
             url = SITE_URL + '/media/' + image.filename

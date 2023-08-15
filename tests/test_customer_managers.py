@@ -2,41 +2,41 @@ from httpx import AsyncClient
 
 
 async def test_add_one_manager(ac: AsyncClient):
-    response = await ac.post("/client_managers", json={
+    response = await ac.post("/customer_managers", json={
         "first_name": "Борис",
         "second_name": "Борисов",
         "last_name": "Борисович",
         "phone": "+77777777777",
         "email": "boris@test.com",
-        "client_id": 1
+        "customer_id": 1
     })
 
     assert response.status_code == 200
     assert response.json()["id"] == 2
 
 
-async def test_add_one_manager_invalid_manufacturer(ac: AsyncClient):
-    response = await ac.post("/client_managers", json={
+async def test_add_one_manager_invalid_customer(ac: AsyncClient):
+    response = await ac.post("/customer_managers", json={
         "first_name": "Борис",
         "second_name": "Борисов",
         "last_name": "Борисович",
         "phone": "+77777777777",
         "email": "boris@test.com",
-        "client_id": 5
+        "customer_id": 55
     })
 
     assert response.status_code == 404
-    assert response.json()["detail"] == 'Client with this id not found'
+    assert response.json()["detail"] == 'Customer with this id not found'
 
 
 async def test_add_one_manager_invalid_name(ac: AsyncClient):
-    response = await ac.post("/client_managers", json={
+    response = await ac.post("/customer_managers", json={
         "first_name": "Борис333",
         "second_name": "Борисов",
         "last_name": "Борисович",
         "phone": "+77777777777",
         "email": "boris@test.com",
-        "client_id": 1
+        "customer_id": 1
     })
 
     assert response.status_code == 200
@@ -44,27 +44,27 @@ async def test_add_one_manager_invalid_name(ac: AsyncClient):
 
 
 async def test_add_one_manager_invalid_phone_unique(ac: AsyncClient):
-    response = await ac.post("/client_managers", json={
+    response = await ac.post("/customer_managers", json={
         "first_name": "Борис",
         "second_name": "Борисов",
         "last_name": "Борисович",
         "phone": "+77777777777",
         "email": "boris2@test.com",
-        "client_id": 1
+        "customer_id": 1
     })
 
     assert response.status_code == 200
-    assert response.json()["detail"] == "UNIQUE constraint failed: clientmanager.phone"
+    assert response.json()["detail"] == "UNIQUE constraint failed: customermanager.phone"
 
 
 async def test_add_one_manager_invalid_phone_text(ac: AsyncClient):
-    response = await ac.post("/client_managers", json={
+    response = await ac.post("/customer_managers", json={
         "first_name": "Борис",
         "second_name": "Борисов",
         "last_name": "Борисович",
         "phone": "asd",
         "email": "boris2@test.com",
-        "client_id": 1
+        "customer_id": 1
     })
 
     assert response.status_code == 200
@@ -72,27 +72,27 @@ async def test_add_one_manager_invalid_phone_text(ac: AsyncClient):
 
 
 async def test_add_one_manager_invalid_email_unique(ac: AsyncClient):
-    response = await ac.post("/client_managers", json={
+    response = await ac.post("/customer_managers", json={
         "first_name": "Борис",
         "second_name": "Борисов",
         "last_name": "Борисович",
         "phone": "+77777777778",
         "email": "boris@test.com",
-        "client_id": 1
+        "customer_id": 1
     })
 
     assert response.status_code == 200
-    assert response.json()["detail"] == "UNIQUE constraint failed: clientmanager.email"
+    assert response.json()["detail"] == "UNIQUE constraint failed: customermanager.email"
 
 
 async def test_add_one_manager_invalid_email_symbols(ac: AsyncClient):
-    response = await ac.post("/client_managers", json={
+    response = await ac.post("/customer_managers", json={
         "first_name": "Борис",
         "second_name": "Борисов",
         "last_name": "Борисович",
         "phone": "+77777777778",
         "email": "test.com",
-        "client_id": 1
+        "customer_id": 1
     })
 
     assert response.status_code == 200
@@ -100,7 +100,7 @@ async def test_add_one_manager_invalid_email_symbols(ac: AsyncClient):
 
 
 async def test_get_list_managers(ac: AsyncClient):
-    response = await ac.get("/client_managers")
+    response = await ac.get("/customer_managers")
 
     assert response.status_code == 200
     assert response.json()[1]["id"] == 2
@@ -108,22 +108,29 @@ async def test_get_list_managers(ac: AsyncClient):
 
 
 async def test_get_one_manager(ac: AsyncClient):
-    response = await ac.get("/client_managers/2")
+    response = await ac.get("/customer_managers/2")
 
     assert response.status_code == 200
     assert response.json()["id"] == 2
 
 
 async def test_edit_one_manager(ac: AsyncClient):
-    response = await ac.patch("/client_managers/2", json={"first_name": "Виктор"})
+    response = await ac.patch("/customer_managers/2", json={"first_name": "Виктор"})
 
     assert response.status_code == 200
     assert response.json()["first_name"] == "Виктор"
     assert response.json()["id"] == 2
 
 
+async def test_edit_one_manager_invalid_customer(ac: AsyncClient):
+    response = await ac.patch("/customer_managers/2", json={"customer_id": "55"})
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == 'Customer with this id not found'
+
+
 async def test_delete_one_manager(ac: AsyncClient):
-    response = await ac.delete("/client_managers/2")
+    response = await ac.delete("/customer_managers/2")
 
     assert response.status_code == 200
     assert response.json()["result"] == "success"

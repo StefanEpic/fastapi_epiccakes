@@ -17,7 +17,7 @@ async def test_add_one_image():
 async def test_add_one_image_invalid_product(ac: AsyncClient):
     filepath = f'{os.path.abspath(os.curdir)}/tests/testfile.jpg'
     with open(filepath, "rb") as image:
-        response = client.post("/images", params={"product_id": 2}, files={"image": image})
+        response = client.post("/images", params={"product_id": 3}, files={"image": image})
 
         assert response.status_code == 404
         assert response.json()["detail"] == 'Product with this id not found'

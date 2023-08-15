@@ -34,6 +34,10 @@ async def add_one(manager: ManufacturerManagerCreate, session: Session = Depends
 @router.patch('/{manager_id}', response_model=ManufacturerManagerRead)
 async def edit_one(manager_id: int, manager: ManufacturerManagerUpdate,
                    session: Session = Depends(get_session)):
+    if manager.manufacturer_id:
+        res = await session.get(Manufacturer, manager.manufacturer_id)
+        if not res:
+            raise HTTPException(status_code=404, detail="Manufacturer with this id not found")
     return await ManufacturerManagerRepository(session).edit_one(manager_id, manager)
 
 

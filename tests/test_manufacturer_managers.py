@@ -15,14 +15,14 @@ async def test_add_one_manager(ac: AsyncClient):
     assert response.json()["id"] == 2
 
 
-async def test_add_one_manager_invalid_cleint(ac: AsyncClient):
+async def test_add_one_manager_invalid_manufacturer(ac: AsyncClient):
     response = await ac.post("/manufacturer_managers", json={
         "first_name": "Борис",
         "second_name": "Борисов",
         "last_name": "Борисович",
         "phone": "+77777777777",
         "email": "boris@test.com",
-        "manufacturer_id": 5
+        "manufacturer_id": 55
     })
 
     assert response.status_code == 404
@@ -120,6 +120,13 @@ async def test_edit_one_manager(ac: AsyncClient):
     assert response.status_code == 200
     assert response.json()["first_name"] == "Виктор"
     assert response.json()["id"] == 2
+
+
+async def test_edit_one_manager_invalid_manufacturer(ac: AsyncClient):
+    response = await ac.patch("/manufacturer_managers/2", json={"manufacturer_id": "55"})
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == 'Manufacturer with this id not found'
 
 
 async def test_delete_one_manager(ac: AsyncClient):

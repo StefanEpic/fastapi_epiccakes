@@ -73,7 +73,7 @@ async def init_db(ac: AsyncClient):
         "manufacturer_id": 1
     })
 
-    await ac.post("/clients", json={
+    await ac.post("/customers", json={
         "title": "ООО Клиент",
         "city": "Москва",
         "street": "Важная",
@@ -81,13 +81,13 @@ async def init_db(ac: AsyncClient):
         "status": "Действующий",
     })
 
-    await ac.post("/client_managers", json={
+    await ac.post("/customer_managers", json={
         "first_name": "Виктор",
         "second_name": "Викторов",
         "last_name": "Викторович",
         "phone": "+78583214589",
         "email": "viktor@test.com",
-        "client_id": 1
+        "customer_id": 1
     })
 
     await ac.post("/staff_managers", json={
@@ -103,9 +103,26 @@ async def init_db(ac: AsyncClient):
         "title": "Хит"
     })
 
+    await ac.post("/categories", json={
+        "title": "Эксклюзив"
+    })
+
+    await ac.post("/categories", json={
+        "title": "Популярное"
+    })
+
     await ac.post("/products", json={
         "title": "Бисквитный пирог",
         "type": "Бисквитные",
         "price": 10,
-        "manufacturer_id": 1
+        "manufacturer_id": 1,
+        "categories": [1, 2]
+    })
+
+    await ac.post("/products", json={
+        "title": "Клубничный кекс",
+        "type": "Бисквитные",
+        "price": 15,
+        "manufacturer_id": 1,
+        "categories": [1, 2, 3]
     })

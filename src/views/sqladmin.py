@@ -1,6 +1,6 @@
 from sqladmin import ModelView
 
-from models.store import Category, Product, Image, Client, ClientManager, Manufacturer, ManufacturerManager, Order, \
+from models.store import Category, Product, Image, Customer, CustomerManager, Manufacturer, ManufacturerManager, Order, \
     Review, StaffManager
 
 
@@ -22,13 +22,13 @@ class ImageAdmin(ModelView, model=Image):
     column_details_list = "__all__"
 
 
-class ClientAdmin(ModelView, model=Client):
+class CustomerAdmin(ModelView, model=Customer):
     column_list = "__all__"
     form_columns = "__all__"
     column_details_list = "__all__"
 
 
-class ClientManagerAdmin(ModelView, model=ClientManager):
+class CustomerManagerAdmin(ModelView, model=CustomerManager):
     column_list = "__all__"
     form_columns = "__all__"
     column_details_list = "__all__"

@@ -1,10 +1,10 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, Query, UploadFile, File
+from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException
 from sqlmodel import Session
 
 from db.db import get_session
-from models.store import ImageRead
+from models.store import ImageRead, Product
 from repositories.store import ImageRepository
 
 router = APIRouter(
@@ -25,6 +25,9 @@ async def get_one(image_id: int, session: Session = Depends(get_session)):
 
 @router.post('', response_model=ImageRead)
 async def add_one(product_id: int, image: UploadFile = File(...), session: Session = Depends(get_session)):
+    res = await session.get(Product, product_id)
+    if not res:
+        raise HTTPException(status_code=404, detail="Product with this id not found")
     return await ImageRepository(session).add_one(product_id, image)
 
 
