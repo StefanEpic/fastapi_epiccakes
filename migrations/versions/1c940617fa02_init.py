@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 900ad46b1194
+Revision ID: 1c940617fa02
 Revises: 
-Create Date: 2023-08-15 19:09:57.943584
+Create Date: 2023-08-16 10:14:57.810822
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision = '900ad46b1194'
+revision = '1c940617fa02'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -75,10 +75,10 @@ def upgrade():
     sa.Column('last_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('phone', sqlmodel.sql.sqltypes.AutoString(length=12), nullable=False),
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('Customer_id', sa.Integer(), nullable=False),
+    sa.Column('customer_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('registration_date', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['Customer_id'], ['customer.id'], ),
+    sa.ForeignKeyConstraint(['customer_id'], ['customer.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('phone')
@@ -102,11 +102,11 @@ def upgrade():
     sa.Column('payment_method', sa.Enum('cash', 'card', name='orderpay'), nullable=False),
     sa.Column('status', sa.Enum('processing', 'done', name='orderstatus'), nullable=False),
     sa.Column('staffmanager_id', sa.Integer(), nullable=False),
-    sa.Column('Customer_id', sa.Integer(), nullable=False),
+    sa.Column('customer_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
     sa.Column('sum_price', sa.Float(), nullable=False),
-    sa.ForeignKeyConstraint(['Customer_id'], ['customer.id'], ),
+    sa.ForeignKeyConstraint(['customer_id'], ['customer.id'], ),
     sa.ForeignKeyConstraint(['staffmanager_id'], ['staffmanager.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -157,10 +157,10 @@ def upgrade():
     sa.Column('rating', sa.Integer(), nullable=False),
     sa.Column('text', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
-    sa.Column('Customer_id', sa.Integer(), nullable=False),
+    sa.Column('customer_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('date_in', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['Customer_id'], ['customer.id'], ),
+    sa.ForeignKeyConstraint(['customer_id'], ['customer.id'], ),
     sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

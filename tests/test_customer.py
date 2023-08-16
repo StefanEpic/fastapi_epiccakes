@@ -11,7 +11,7 @@ async def test_add_one_customer(ac: AsyncClient):
     })
 
     assert response.status_code == 200
-    assert response.json()["id"] == 2
+    assert response.json()["id"] == 3
 
 
 async def test_add_one_customer_unique(ac: AsyncClient):
@@ -31,15 +31,15 @@ async def test_get_list_customers(ac: AsyncClient):
     response = await ac.get("/customers")
 
     assert response.status_code == 200
-    assert response.json()[1]["id"] == 2
-    assert len(response.json()) == 2
+    assert response.json()[2]["id"] == 3
+    assert len(response.json()) == 3
 
 
 async def test_get_one_customer(ac: AsyncClient):
-    response = await ac.get("/customers/2")
+    response = await ac.get("/customers/3")
 
     assert response.status_code == 200
-    assert response.json()["id"] == 2
+    assert response.json()["id"] == 3
 
 
 async def test_get_one_customer_with_managers(ac: AsyncClient):
@@ -50,15 +50,15 @@ async def test_get_one_customer_with_managers(ac: AsyncClient):
 
 
 async def test_edit_one_customer(ac: AsyncClient):
-    response = await ac.patch("/customers/2", json={"title": "ИП Здорово"})
+    response = await ac.patch("/customers/3", json={"title": "ИП Здорово"})
 
     assert response.status_code == 200
     assert response.json()["title"] == "ИП Здорово"
-    assert response.json()["id"] == 2
+    assert response.json()["id"] == 3
 
 
 async def test_delete_one_customer(ac: AsyncClient):
-    response = await ac.delete("/customers/2")
+    response = await ac.delete("/customers/3")
 
     assert response.status_code == 200
     assert response.json()["result"] == "success"

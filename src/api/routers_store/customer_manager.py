@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi_cache.decorator import cache
 from sqlmodel import Session
 
 from db.db import get_session
@@ -14,11 +15,13 @@ router = APIRouter(
 
 
 @router.get('', response_model=List[CustomerManagerRead])
+@cache(expire=300)
 async def get_list(offset: int = 0, limit: int = Query(default=100, lte=100), session: Session = Depends(get_session)):
     return await CustomerManagerRepository(session).get_list(offset, limit)
 
 
 @router.get('/{manager_id}', response_model=CustomerManagerRead)
+@cache(expire=300)
 async def get_one(manager_id: int, session: Session = Depends(get_session)):
     return await CustomerManagerRepository(session).get_one(manager_id)
 

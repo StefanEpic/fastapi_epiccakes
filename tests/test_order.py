@@ -15,7 +15,7 @@ async def test_add_one_order(ac: AsyncClient):
     })
 
     assert response.status_code == 200
-    assert response.json()["id"] == 1
+    assert response.json()["id"] == 2
     assert response.json()["sum_price"] == 95
 
 
@@ -32,7 +32,7 @@ async def test_add_one_order_2(ac: AsyncClient):
     })
 
     assert response.status_code == 200
-    assert response.json()["id"] == 2
+    assert response.json()["id"] == 3
     assert response.json()["sum_price"] == 105
 
 
@@ -88,8 +88,8 @@ async def test_get_list_orders(ac: AsyncClient):
     response = await ac.get("/orders")
 
     assert response.status_code == 200
-    assert response.json()[1]["id"] == 2
-    assert len(response.json()) == 2
+    assert response.json()[2]["id"] == 3
+    assert len(response.json()) == 3
 
 
 async def test_get_one_order(ac: AsyncClient):
@@ -137,7 +137,7 @@ async def test_edit_one_order_invalid_product(ac: AsyncClient):
 
 
 async def test_delete_one_order(ac: AsyncClient):
-    response = await ac.delete("/orders/1")
+    response = await ac.delete("/orders/2")
 
     assert response.status_code == 200
     assert response.json()["result"] == "success"

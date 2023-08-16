@@ -7,7 +7,7 @@ from api.routers_store.manufacturer_manager import router as router_store_manufa
 from api.routers_store.staff_manager import router as router_store_staff_manager
 from api.routers_store.image import router as router_store_image
 from api.routers_store.order import router as router_store_order
-# from api.routers_store.review import router as router_store_review
+from api.routers_store.review import router as router_store_review
 
 all_routers = [
     router_store_category,
@@ -19,5 +19,5 @@ all_routers = [
     router_store_staff_manager,
     router_store_image,
     router_store_order,
-    # router_store_review
+    router_store_review
 ]

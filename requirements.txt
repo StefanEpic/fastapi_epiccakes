@@ -1,4 +1,8 @@
 fastapi[all]
 sqlmodel
 alembic
+fastapi-cache2[redis]
+sqladmin
+
+
 aiosqlite

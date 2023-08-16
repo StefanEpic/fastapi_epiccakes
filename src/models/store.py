@@ -7,7 +7,7 @@ from typing import Optional, List, Dict, Tuple
 from sqlalchemy.orm import validates
 from sqlmodel import SQLModel, Field, Relationship
 
-from utils.validators import name_valid, phone_valid, email_valid
+from utils.validators import name_valid, phone_valid, email_valid, rating_valid
 
 
 # -------------------------------
@@ -81,7 +81,8 @@ class Customer(CustomerBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     registration_date: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
-    managers: List["CustomerManager"] = Relationship(back_populates="customer", sa_relationship_kwargs={'lazy': 'selectin'})
+    managers: List["CustomerManager"] = Relationship(back_populates="customer",
+                                                     sa_relationship_kwargs={'lazy': 'selectin'})
     orders: List["Order"] = Relationship(back_populates="customer", sa_relationship_kwargs={'lazy': 'selectin'})
     reviews: List["Review"] = Relationship(back_populates="customer", sa_relationship_kwargs={'lazy': 'selectin'})
 
@@ -514,7 +515,11 @@ class ReviewBase(SQLModel):
     text: str
 
     order_id: int = Field(foreign_key="order.id")
-    Customer_id: int = Field(foreign_key="customer.id")
+    customer_id: int = Field(foreign_key="customer.id")
+
+    @validates("rating")
+    def validate_rating(self, key, rating):
+        return rating_valid(rating)
 
 
 class Review(ReviewBase, table=True):
@@ -537,6 +542,3 @@ class ReviewRead(ReviewBase):
 class ReviewUpdate(SQLModel):
     rating: Optional[int] = Field(default=0)
     text: Optional[str]
-
-    order_id: Optional[int] = Field(foreign_key="order.id")
-    customer_id: Optional[int] = Field(foreign_key="customer.id")
