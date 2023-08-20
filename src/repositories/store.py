@@ -182,4 +182,4 @@ class ImageRepository(SQLAlchemyRepository):
         os.remove(res.path)
         await self.session.delete(res)
         await self.session.commit()
-        return {"result": "success"}
+        return {"detail": "success"}

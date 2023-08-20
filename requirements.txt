@@ -3,6 +3,7 @@ sqlmodel
 alembic
 fastapi-cache2[redis]
 sqladmin
-
-
-aiosqlite
+python-jose[cryptography]
+asyncpg
+gunicorn
+passlib

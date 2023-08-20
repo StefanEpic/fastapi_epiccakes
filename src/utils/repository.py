@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
+from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 
 
@@ -14,7 +15,7 @@ class AbstractRepository(ABC):
 class SQLAlchemyRepository(AbstractRepository):
     model = None
 
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def get_list(self, offset: int, limit: int):
@@ -62,4 +63,4 @@ class SQLAlchemyRepository(AbstractRepository):
             raise HTTPException(status_code=404, detail="Not found")
         await self.session.delete(res)
         await self.session.commit()
-        return {"result": "success"}
+        return {"detail": "success"}

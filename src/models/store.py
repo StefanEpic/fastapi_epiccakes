@@ -2,7 +2,7 @@ import enum
 import datetime
 
 from pydantic import condecimal
-from typing import Optional, List, Dict, Tuple
+from typing import Optional, List, Dict
 
 from sqlalchemy.orm import validates
 from sqlmodel import SQLModel, Field, Relationship
@@ -57,9 +57,9 @@ class CategoryUpdate(SQLModel):
     description: Optional[str]
 
 
-# ------------------
+# --------------------
 # ----- Customer -----
-# ------------------
+# --------------------
 class CustomerStatus(enum.Enum):
     active = "Действующий"
     inactive = "Недействующий"
@@ -111,9 +111,9 @@ class CustomerUpdate(SQLModel):
     status: Optional[CustomerStatus]
 
 
-# -------------------------
+# ---------------------------
 # ----- CustomerManager -----
-# -------------------------
+# ---------------------------
 class CustomerManagerBase(SQLModel):
     first_name: str
     second_name: str
@@ -381,8 +381,8 @@ class Product(ProductBase, table=True):
                                                 sa_relationship_kwargs={'lazy': 'selectin'})
     orders: List["Order"] = Relationship(back_populates="products", link_model=OrderProductLink)
 
-    # def __str__(self):
-    #     return self.title
+    def __str__(self):
+        return self.title
 
 
 class ProductCreate(ProductBase):
@@ -478,6 +478,9 @@ class Order(OrderBase, table=True):
     products: List["Product"] = Relationship(back_populates="orders", link_model=OrderProductLink,
                                              sa_relationship_kwargs={'lazy': 'selectin'})
 
+    def __str__(self):
+        return f'{self.customer_id} / {self.status}'
+
 
 class OrderCreate(OrderBase):
     products: Dict[int, int]
@@ -528,6 +531,9 @@ class Review(ReviewBase, table=True):
 
     order: Order = Relationship(back_populates="reviews")
     customer: Customer = Relationship(back_populates="reviews")
+
+    def __str__(self):
+        return f'{self.rating} / {self.text[:20]}...'
 
 
 class ReviewCreate(ReviewBase):

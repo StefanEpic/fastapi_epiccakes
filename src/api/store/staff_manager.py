@@ -1,11 +1,13 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
-from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from db.db import get_session
+from models.auth import User
 from models.store import StaffManagerRead, StaffManagerCreate, StaffManagerUpdate, StaffManagerReadWithOrders
 from repositories.store import StaffManagerRepository
+from utils.auth import get_current_user_permissions
 
 router = APIRouter(
     prefix="/staff_managers",
@@ -14,26 +16,32 @@ router = APIRouter(
 
 
 @router.get('', response_model=List[StaffManagerRead])
-async def get_list(offset: int = 0, limit: int = Query(default=100, lte=100), session: Session = Depends(get_session)):
+async def get_list(offset: int = 0, limit: int = Query(default=100, lte=100),
+                   session: AsyncSession = Depends(get_session),
+                   current_user: User = Depends(get_current_user_permissions)):
     return await StaffManagerRepository(session).get_list(offset, limit)
 
 
 @router.get('/{manager_id}', response_model=StaffManagerReadWithOrders)
-async def get_one(manager_id: int, session: Session = Depends(get_session)):
+async def get_one(manager_id: int, session: AsyncSession = Depends(get_session),
+                  current_user: User = Depends(get_current_user_permissions)):
     return await StaffManagerRepository(session).get_one(manager_id)
 
 
 @router.post('', response_model=StaffManagerRead)
-async def add_one(manager: StaffManagerCreate, session: Session = Depends(get_session)):
+async def add_one(manager: StaffManagerCreate, session: AsyncSession = Depends(get_session),
+                  current_user: User = Depends(get_current_user_permissions)):
     return await StaffManagerRepository(session).add_one(manager)
 
 
 @router.patch('/{manager_id}', response_model=StaffManagerRead)
 async def edit_one(manager_id: int, manager: StaffManagerUpdate,
-                   session: Session = Depends(get_session)):
+                   session: AsyncSession = Depends(get_session),
+                   current_user: User = Depends(get_current_user_permissions)):
     return await StaffManagerRepository(session).edit_one(manager_id, manager)
 
 
 @router.delete('/{manager_id}')
-async def delete_one(manager_id: int, session: Session = Depends(get_session)):
+async def delete_one(manager_id: int, session: AsyncSession = Depends(get_session),
+                     current_user: User = Depends(get_current_user_permissions)):
     return await StaffManagerRepository(session).delete_one(manager_id)
