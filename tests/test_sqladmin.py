@@ -4,7 +4,7 @@ from httpx import AsyncClient
 async def test_login_logout(ac: AsyncClient):
     response = await ac.post("/admin/login",
                              data={
-                                 "username": "admin",
+                                 "username": "admin@admin.com",
                                  "password": "12345"
                              })
 
