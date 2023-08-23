@@ -7,6 +7,7 @@ async def test_add_one_customer(auth_ac: AsyncClient):
         "city": "Москва",
         "street": "Главная",
         "house": "34",
+        "metro_station": "Центральная",
         "status": "Действующий",
     })
 
@@ -33,6 +34,18 @@ async def test_get_list_customers(auth_ac: AsyncClient):
     assert response.status_code == 200
     assert response.json()[2]["id"] == 3
     assert len(response.json()) == 3
+
+
+async def test_get_list_customers_with_filter(auth_ac: AsyncClient):
+    response = await auth_ac.get("/customers", params={
+        "city": "Москва",
+        "street": "Главная",
+        "metro_station": "Центральная"
+    })
+
+    assert response.status_code == 200
+    assert response.json()[0]["id"] == 3
+    assert len(response.json()) == 1
 
 
 async def test_get_one_customer(auth_ac: AsyncClient):

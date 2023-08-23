@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from db.db import MEDIA_URL, SITE_URL
 from models.store import Category, Product, Image, Customer, CustomerManager, Manufacturer, ManufacturerManager, Order, \
     Review, StaffManager, OrderProductLink
-from utils.repository import SQLAlchemyRepository
+from utils.repository import SQLAlchemyRepository, AddressFilterRepository, UserFilterRepository
 
 
 class CategoryRepository(SQLAlchemyRepository):
@@ -64,19 +64,19 @@ class ProductRepository(SQLAlchemyRepository):
             raise HTTPException(status_code=200, detail=str(e.orig))
 
 
-class CustomerRepository(SQLAlchemyRepository):
+class CustomerRepository(AddressFilterRepository):
     model = Customer
 
 
-class CustomerManagerRepository(SQLAlchemyRepository):
+class CustomerManagerRepository(UserFilterRepository):
     model = CustomerManager
 
 
-class ManufacturerRepository(SQLAlchemyRepository):
+class ManufacturerRepository(AddressFilterRepository):
     model = Manufacturer
 
 
-class ManufacturerManagerRepository(SQLAlchemyRepository):
+class ManufacturerManagerRepository(UserFilterRepository):
     model = ManufacturerManager
 
 
@@ -150,7 +150,7 @@ class ReviewRepository(SQLAlchemyRepository):
     model = Review
 
 
-class StaffManagerRepository(SQLAlchemyRepository):
+class StaffManagerRepository(UserFilterRepository):
     model = StaffManager
 
 

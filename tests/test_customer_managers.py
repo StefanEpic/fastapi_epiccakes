@@ -107,6 +107,17 @@ async def test_get_list_managers(auth_ac: AsyncClient):
     assert len(response.json()) == 2
 
 
+async def test_get_list_managers_with_filter(auth_ac: AsyncClient):
+    response = await auth_ac.get("/customer_managers", params={
+        "phone": "+77777777777",
+        "email": "boris@test.com"
+    })
+
+    assert response.status_code == 200
+    assert response.json()[0]["id"] == 2
+    assert len(response.json()) == 1
+
+
 async def test_get_one_manager(auth_ac: AsyncClient):
     response = await auth_ac.get("/customer_managers/2")
 

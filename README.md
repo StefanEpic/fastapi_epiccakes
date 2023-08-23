@@ -40,16 +40,16 @@ src/api/routers.py                         13      0      0      0   100%
 src/api/sqladmin/__init__.py                0      0      0      0   100%
 src/api/sqladmin/views.py                  38      5      4      1    81%
 src/api/store/__init__.py                   0      0      0      0   100%
-src/api/store/category.py                  27      0      0      0   100%
-src/api/store/customer.py                  27      0      0      0   100%
-src/api/store/customer_manager.py          32      0      2      0   100%
-src/api/store/image.py                     26      0      0      0   100%
-src/api/store/manufacturer.py              27      0      0      0   100%
-src/api/store/manufacturer_manager.py      32      0      2      0   100%
-src/api/store/order.py                     37      0      4      0   100%
-src/api/store/product.py                   32      0      2      0   100%
-src/api/store/review.py                    32      0      0      0   100%
-src/api/store/staff_manager.py             24      0      0      0   100%
+src/api/store/category.py                  28      0      0      0   100%
+src/api/store/customer.py                  28      0      0      0   100%
+src/api/store/customer_manager.py          28      0      0      0   100%
+src/api/store/image.py                     25      0      0      0   100%
+src/api/store/manufacturer.py              28      0      0      0   100%
+src/api/store/manufacturer_manager.py      28      0      0      0   100%
+src/api/store/order.py                     28      0      0      0   100%
+src/api/store/product.py                   28      0      0      0   100%
+src/api/store/review.py                    28      0      0      0   100%
+src/api/store/staff_manager.py             25      0      0      0   100%
 src/db/__init__.py                          0      0      0      0   100%
 src/db/db.py                               19      3      2      0    76%
 src/main.py                                21      2      4      0    92%
@@ -61,10 +61,11 @@ src/repositories/store.py                 126      0     20      0   100%
 src/repositories/user.py                   31      0      2      0   100%
 src/utils/__init__.py                       0      0      0      0   100%
 src/utils/auth.py                          69      4     12      4    90%
-src/utils/repository.py                    49      1      4      0    98%
-src/utils/validators.py                    18      0      8      0   100%
+src/utils/depends.py                       69      0     10      0   100%
+src/utils/repository.py                    71      1     28      0    99%
+src/utils/validators.py                    21      0      8      0   100%
 src/views/__init__.py                       0      0      0      0   100%
 src/views/sqladmin.py                      64      0      0      0   100%
 -------------------------------------------------------------------------
-TOTAL                                    1188     28     78      8    97%
+TOTAL                                    1260     28    102      8    97%
 ```
