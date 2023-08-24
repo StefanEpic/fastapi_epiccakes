@@ -7,3 +7,5 @@ python-jose[cryptography]
 asyncpg
 gunicorn
 passlib
+sentry-sdk[fastapi]
+prometheus-fastapi-instrumentator

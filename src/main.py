@@ -1,7 +1,12 @@
+import os
+
+import sentry_sdk
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from redis import asyncio as aioredis
 
@@ -10,6 +15,11 @@ from sqladmin import Admin
 from api.routers import all_routers
 from api.sqladmin.views import all_views, authentication_backend
 from db.db import engine
+
+load_dotenv()
+SENTRY_TOKEN = os.environ.get("SENTRY_TOKEN")
+
+sentry_sdk.init(dsn=SENTRY_TOKEN, traces_sample_rate=1.0,)
 
 app = FastAPI(title="EpicCakes")
 
@@ -34,6 +44,7 @@ app.add_middleware(
                    "Authorization"],
 )
 
+Instrumentator().instrument(app).expose(app)
 
 @app.on_event("startup")
 async def startup():
