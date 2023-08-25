@@ -5,6 +5,8 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-blue?style=flat&logo=postgresql&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat&logo=grafana&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
 
 АPI for online store
@@ -12,7 +14,7 @@
 <img src="https://github.com/StefanEpic/fastapi_epiccakes/blob/main/src/media/001.jpg" width="600">
 
 ## 🍰 Usage
-The API allows you to work with online store requests. Allows you to work with entities: products, orders, manufacturers, customers, reviews. There is also registration and authorization, admin panel.
+The API allows you to work with online store requests. Allows you to work with entities: products, orders, manufacturers, customers, reviews. There is also registration and authorization, admin panel, logging and metrics.
 
 ## 🍪 API demo
 You can test:
@@ -25,6 +27,11 @@ You can test:
 [Admin panel](http://31.129.98.245/admin):
 
 - username: admin@admin.com
+- password: 12345
+
+[Metrics](http://31.129.98.245/grafana/d/_eX4mpl3/fastapi-dashboard?orgId=1&refresh=5s&from=now-24h&to=now):
+
+- username: admin
 - password: 12345
 
 ## 🍩 Tests
