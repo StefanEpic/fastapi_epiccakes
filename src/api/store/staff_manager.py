@@ -17,14 +17,14 @@ router = APIRouter(
 
 
 @router.get('', response_model=List[StaffManagerRead])
-async def get_list(pagination: Pagination = Depends(Pagination),
-                   filters: UserFilter = Depends(UserFilter),
-                   session: AsyncSession = Depends(get_session),
-                   current_user: User = Depends(get_current_user_permissions)):
-    return await StaffManagerRepository(session).get_list(pagination.skip,
-                                                          pagination.limit,
-                                                          filters.phone,
-                                                          filters.email)
+async def get_user_filter_list(pagination: Pagination = Depends(Pagination),
+                               filters: UserFilter = Depends(UserFilter),
+                               session: AsyncSession = Depends(get_session),
+                               current_user: User = Depends(get_current_user_permissions)):
+    return await StaffManagerRepository(session).get_user_filter_list(pagination.skip,
+                                                                      pagination.limit,
+                                                                      filters.phone,
+                                                                      filters.email)
 
 
 @router.get('/{manager_id}', response_model=StaffManagerReadWithOrders)

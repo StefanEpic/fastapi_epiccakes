@@ -9,7 +9,7 @@ from utils.repository import SQLAlchemyRepository
 class UserRepository(SQLAlchemyRepository):
     model = User
 
-    async def add_one(self, user: UserCreate):
+    async def add_one_user(self, user: UserCreate):
         try:
             hashed_password = Hasher.get_password_hash(user.password)
             new_user = User(first_name=user.first_name,
@@ -27,7 +27,7 @@ class UserRepository(SQLAlchemyRepository):
         except IntegrityError as e:
             raise HTTPException(status_code=200, detail=str(e.orig))
 
-    async def edit_one(self, user_id: int, user: UserCreate):
+    async def edit_one_user(self, user_id: int, user: UserCreate):
         try:
             res = await self.session.get(User, user_id)
             if not res:

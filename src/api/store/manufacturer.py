@@ -19,15 +19,15 @@ router = APIRouter(
 
 @router.get('', response_model=List[ManufacturerRead])
 @cache(expire=30)
-async def get_list(pagination: Pagination = Depends(Pagination),
-                   filters: AddressFilter = Depends(AddressFilter),
-                   session: AsyncSession = Depends(get_session),
-                   current_user: User = Depends(get_current_user_permissions)):
-    return await ManufacturerRepository(session).get_list(pagination.skip,
-                                                          pagination.limit,
-                                                          filters.city,
-                                                          filters.street,
-                                                          filters.metro_station)
+async def get_address_filter_list(pagination: Pagination = Depends(Pagination),
+                                  filters: AddressFilter = Depends(AddressFilter),
+                                  session: AsyncSession = Depends(get_session),
+                                  current_user: User = Depends(get_current_user_permissions)):
+    return await ManufacturerRepository(session).get_address_filter_list(pagination.skip,
+                                                                         pagination.limit,
+                                                                         filters.city,
+                                                                         filters.street,
+                                                                         filters.metro_station)
 
 
 @router.get('/{manufacturer_id}', response_model=ManufacturerReadWithManagers)

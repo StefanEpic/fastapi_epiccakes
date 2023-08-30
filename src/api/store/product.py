@@ -35,7 +35,7 @@ async def get_one(product_id: int,
 async def add_one(product: ProductCreate = Depends(product_create),
                   session: AsyncSession = Depends(get_session),
                   current_user: User = Depends(get_current_user_permissions)):
-    return await ProductRepository(session).add_one(product)
+    return await ProductRepository(session).add_one_product(product)
 
 
 @router.patch('/{product_id}', response_model=ProductReadWithCategoriesAndImages)
@@ -43,7 +43,7 @@ async def edit_one(product_id: int,
                    product: ProductUpdate = Depends(product_update),
                    session: AsyncSession = Depends(get_session),
                    current_user: User = Depends(get_current_user_permissions)):
-    return await ProductRepository(session).edit_one(product_id, product)
+    return await ProductRepository(session).edit_one_product(product_id, product)
 
 
 @router.delete('/{product_id}')

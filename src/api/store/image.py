@@ -36,11 +36,11 @@ async def add_one(product_id: int = Depends(product_valid),
                   image: UploadFile = File(...),
                   session: AsyncSession = Depends(get_session),
                   current_user: User = Depends(get_current_user_permissions)):
-    return await ImageRepository(session).add_one(product_id, image)
+    return await ImageRepository(session).add_one_image(product_id, image)
 
 
 @router.delete('/{image_id}')
 async def delete_one(image_id: int,
                      session: AsyncSession = Depends(get_session),
                      current_user: User = Depends(get_current_user_permissions)):
-    return await ImageRepository(session).delete_one(image_id)
+    return await ImageRepository(session).delete_one_image(image_id)

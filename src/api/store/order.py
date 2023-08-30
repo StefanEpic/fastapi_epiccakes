@@ -37,7 +37,7 @@ async def get_one(order_id: int,
 async def add_one(order: OrderCreate = Depends(order_create),
                   session: AsyncSession = Depends(get_session),
                   current_user: User = Depends(get_current_user_permissions)):
-    return await OrderRepository(session).add_one(order)
+    return await OrderRepository(session).add_one_order(order)
 
 
 @router.patch('/{order_id}', response_model=OrderReadWithProducts)
@@ -45,7 +45,7 @@ async def edit_one(order_id: int,
                    order: OrderUpdate = Depends(order_update),
                    session: AsyncSession = Depends(get_session),
                    current_user: User = Depends(get_current_user_permissions)):
-    return await OrderRepository(session).edit_one(order_id, order)
+    return await OrderRepository(session).edit_one_order(order_id, order)
 
 
 @router.delete('/{order_id}')

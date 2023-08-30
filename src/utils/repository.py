@@ -67,7 +67,7 @@ class SQLAlchemyRepository(AbstractRepository):
 
 
 class AddressFilterRepository(SQLAlchemyRepository):
-    async def get_list(self, offset: int, limit: int, city: str, street: str, metro_station: str):
+    async def get_address_filter_list(self, offset: int, limit: int, city: str, street: str, metro_station: str):
         stmt = select(self.model).offset(offset).limit(limit)
         res = await self.session.execute(stmt)
         res = [row[0] for row in res.all()]
@@ -81,7 +81,7 @@ class AddressFilterRepository(SQLAlchemyRepository):
 
 
 class UserFilterRepository(SQLAlchemyRepository):
-    async def get_list(self, offset: int, limit: int, phone: str, email: str):
+    async def get_user_filter_list(self, offset: int, limit: int, phone: str, email: str):
         stmt = select(self.model).offset(offset).limit(limit)
         res = await self.session.execute(stmt)
         res = [row[0] for row in res.all()]

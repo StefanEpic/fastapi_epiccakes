@@ -16,7 +16,7 @@ class CategoryRepository(SQLAlchemyRepository):
 class ProductRepository(SQLAlchemyRepository):
     model = Product
 
-    async def add_one(self, data):
+    async def add_one_product(self, data):
         try:
             res = self.model.from_orm(data)
 
@@ -35,7 +35,7 @@ class ProductRepository(SQLAlchemyRepository):
         except IntegrityError as e:
             raise HTTPException(status_code=200, detail=str(e.orig))
 
-    async def edit_one(self, self_id: int, data):
+    async def edit_one_product(self, self_id: int, data):
         try:
             res = await self.session.get(self.model, self_id)
             if not res:
@@ -83,7 +83,7 @@ class ManufacturerManagerRepository(UserFilterRepository):
 class OrderRepository(SQLAlchemyRepository):
     model = Order
 
-    async def add_one(self, data):
+    async def add_one_order(self, data):
         try:
             for product in data.products:
                 prod_res = await self.session.get(Product, product)
@@ -110,7 +110,7 @@ class OrderRepository(SQLAlchemyRepository):
         except IntegrityError as e:
             raise HTTPException(status_code=200, detail=str(e.orig))
 
-    async def edit_one(self, self_id: int, data):
+    async def edit_one_order(self, self_id: int, data):
         try:
             res = await self.session.get(self.model, self_id)
             if not res:
@@ -157,7 +157,7 @@ class StaffManagerRepository(UserFilterRepository):
 class ImageRepository(SQLAlchemyRepository):
     model = Image
 
-    async def add_one(self, product_id, image):
+    async def add_one_image(self, product_id, image):
         try:
             contents = await image.read()
             filepath = f'{MEDIA_URL}/{image.filename}'
@@ -175,7 +175,7 @@ class ImageRepository(SQLAlchemyRepository):
         except IntegrityError as e:
             raise HTTPException(status_code=200, detail=str(e.orig))
 
-    async def delete_one(self, self_id: int):
+    async def delete_one_image(self, self_id: int):
         res = await self.session.get(self.model, self_id)
         if not res:
             raise HTTPException(status_code=404, detail="Not found")

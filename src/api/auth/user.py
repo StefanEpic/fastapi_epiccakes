@@ -36,7 +36,7 @@ async def get_one(user_id: int, session: AsyncSession = Depends(get_session),
 @router.post("", response_model=UserRead)
 async def create_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
     try:
-        return await UserRepository(session).add_one(user)
+        return await UserRepository(session).add_one_user(user)
     except IntegrityError as err:
         logger.error(err)
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
@@ -45,7 +45,7 @@ async def create_user(user: UserCreate, session: AsyncSession = Depends(get_sess
 @router.patch('/{user_id}', response_model=UserRead)
 async def edit_one(user_id: int, user: UserCreate, session: AsyncSession = Depends(get_session),
                    current_user: User = Depends(get_current_user_permissions)):
-    return await UserRepository(session).edit_one(user_id, user)
+    return await UserRepository(session).edit_one_user(user_id, user)
 
 
 @router.delete('/{user_id}')
