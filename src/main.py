@@ -19,7 +19,7 @@ from db.db import engine
 load_dotenv()
 SENTRY_TOKEN = os.environ.get("SENTRY_TOKEN")
 
-sentry_sdk.init(dsn=SENTRY_TOKEN, traces_sample_rate=1.0,)
+sentry_sdk.init(dsn=SENTRY_TOKEN, traces_sample_rate=1.0, )
 
 app = FastAPI(title="EpicCakes")
 
@@ -45,6 +45,7 @@ app.add_middleware(
 )
 
 Instrumentator().instrument(app).expose(app)
+
 
 @app.on_event("startup")
 async def startup():

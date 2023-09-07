@@ -21,7 +21,8 @@ router = APIRouter(
 @cache(expire=30)
 async def get_list(pagination: Pagination = Depends(Pagination),
                    session: AsyncSession = Depends(get_session)):
-    return await CategoryRepository(session).get_list(pagination.skip, pagination.limit)
+    return await CategoryRepository(session).get_list(pagination.skip,
+                                                      pagination.limit)
 
 
 @router.get('/{category_id}', response_model=CategoryRead)
@@ -49,5 +50,6 @@ async def edit_one(category_id: int,
 @router.delete('/{category_id}')
 async def delete_one(category_id: int,
                      session: AsyncSession = Depends(get_session),
-                     current_user: User = Depends(get_current_user_permissions)):
+                     current_user: User = Depends(
+                         get_current_user_permissions)):
     return await CategoryRepository(session).delete_one(category_id)

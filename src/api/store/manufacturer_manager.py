@@ -6,7 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from db.db import get_session
 from models.auth import User
-from models.store import ManufacturerManagerRead, ManufacturerManagerCreate, ManufacturerManagerUpdate, Manufacturer
+from models.store import ManufacturerManagerRead, ManufacturerManagerCreate, ManufacturerManagerUpdate
 from repositories.store import ManufacturerManagerRepository
 from utils.auth import get_current_user_permissions
 from utils.depends import Pagination, manufacturer_create, manufacturer_update, UserFilter

@@ -21,20 +21,23 @@ logger = getLogger(__name__)
 
 
 @router.get('', response_model=List[UserRead])
-async def get_list(offset: int = 0, limit: int = Query(default=100, lte=100),
+async def get_list(offset: int = 0,
+                   limit: int = Query(default=100, lte=100),
                    session: AsyncSession = Depends(get_session),
                    current_user: User = Depends(get_current_user_permissions)):
     return await UserRepository(session).get_list(offset, limit)
 
 
 @router.get('/{user_id}', response_model=UserRead)
-async def get_one(user_id: int, session: AsyncSession = Depends(get_session),
+async def get_one(user_id: int,
+                  session: AsyncSession = Depends(get_session),
                   current_user: User = Depends(get_current_user_permissions)):
     return await UserRepository(session).get_one(user_id)
 
 
 @router.post("", response_model=UserRead)
-async def create_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
+async def create_user(user: UserCreate,
+                      session: AsyncSession = Depends(get_session)):
     try:
         return await UserRepository(session).add_one_user(user)
     except IntegrityError as err:
@@ -43,12 +46,16 @@ async def create_user(user: UserCreate, session: AsyncSession = Depends(get_sess
 
 
 @router.patch('/{user_id}', response_model=UserRead)
-async def edit_one(user_id: int, user: UserCreate, session: AsyncSession = Depends(get_session),
+async def edit_one(user_id: int,
+                   user: UserCreate,
+                   session: AsyncSession = Depends(get_session),
                    current_user: User = Depends(get_current_user_permissions)):
     return await UserRepository(session).edit_one_user(user_id, user)
 
 
 @router.delete('/{user_id}')
-async def delete_user(user_id: int, session: AsyncSession = Depends(get_session),
-                      current_user: User = Depends(get_current_user_permissions)):
+async def delete_user(user_id: int,
+                      session: AsyncSession = Depends(get_session),
+                      current_user: User = Depends(
+                          get_current_user_permissions)):
     return await UserRepository(session).delete_one(user_id)
