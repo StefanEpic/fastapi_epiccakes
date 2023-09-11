@@ -5,8 +5,7 @@ async def test_add_one_order(auth_ac: AsyncClient):
     response = await auth_ac.post("/orders", json={
         "delivery_method": "Доставка",
         "payment_method": "Наличными",
-        "status": "В работе",
-        "staffmanager_id": 1,
+        "staff_manager_id": 1,
         "customer_id": 1,
         "products": {
             "1": 2,
@@ -23,8 +22,7 @@ async def test_add_one_order_2(auth_ac: AsyncClient):
     response = await auth_ac.post("/orders", json={
         "delivery_method": "Доставка",
         "payment_method": "Наличными",
-        "status": "В работе",
-        "staffmanager_id": 1,
+        "staff_manager_id": 1,
         "customer_id": 1,
         "products": {
             "2": 7
@@ -36,12 +34,11 @@ async def test_add_one_order_2(auth_ac: AsyncClient):
     assert response.json()["sum_price"] == 105
 
 
-async def test_add_one_order_invalid_staffmanager(auth_ac: AsyncClient):
+async def test_add_one_order_invalid_staff_manager(auth_ac: AsyncClient):
     response = await auth_ac.post("/orders", json={
         "delivery_method": "Доставка",
         "payment_method": "Наличными",
-        "status": "В работе",
-        "staffmanager_id": 55,
+        "staff_manager_id": 55,
         "customer_id": 1,
         "products": {
             "2": 7
@@ -56,8 +53,7 @@ async def test_add_one_order_invalid_customer(auth_ac: AsyncClient):
     response = await auth_ac.post("/orders", json={
         "delivery_method": "Доставка",
         "payment_method": "Наличными",
-        "status": "В работе",
-        "staffmanager_id": 1,
+        "staff_manager_id": 1,
         "customer_id": 55,
         "products": {
             "2": 7
@@ -72,8 +68,7 @@ async def test_add_one_order_invalid_product(auth_ac: AsyncClient):
     response = await auth_ac.post("/orders", json={
         "delivery_method": "Доставка",
         "payment_method": "Наличными",
-        "status": "В работе",
-        "staffmanager_id": 1,
+        "staff_manager_id": 1,
         "customer_id": 1,
         "products": {
             "5": 7
@@ -116,7 +111,7 @@ async def test_edit_one_order_no_product(auth_ac: AsyncClient):
 
 
 async def test_edit_one_order_invalid_staffmanager(auth_ac: AsyncClient):
-    response = await auth_ac.patch("/orders/2", json={"staffmanager_id": 55})
+    response = await auth_ac.patch("/orders/2", json={"staff_manager_id": 55})
 
     assert response.status_code == 404
     assert response.json()["detail"] == 'Staff manager with this id not found'

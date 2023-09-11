@@ -54,7 +54,7 @@ async def test_add_one_manager_invalid_phone_unique(auth_ac: AsyncClient):
     })
 
     assert response.status_code == 200
-    assert response.json()["detail"] == "UNIQUE constraint failed: customermanager.phone"
+    assert response.json()["detail"] == "UNIQUE constraint failed: customer_manager.phone"
 
 
 async def test_add_one_manager_invalid_phone_text(auth_ac: AsyncClient):
@@ -82,7 +82,7 @@ async def test_add_one_manager_invalid_email_unique(auth_ac: AsyncClient):
     })
 
     assert response.status_code == 200
-    assert response.json()["detail"] == "UNIQUE constraint failed: customermanager.email"
+    assert response.json()["detail"] == "UNIQUE constraint failed: customer_manager.email"
 
 
 async def test_add_one_manager_invalid_email_symbols(auth_ac: AsyncClient):

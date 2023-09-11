@@ -6,7 +6,7 @@ services:
     image: postgres:14-alpine
     restart: always
     env_file:
-      - src/.env
+      - backend/.env
     volumes:
       - db-data:/var/lib/postgresql/data
     expose:
@@ -15,14 +15,14 @@ services:
       - custom
 
 
-  app:
-    container_name: app
-    image: app
+  backend:
+    container_name: backend
+    image: backend
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./backend/Dockerfile
     env_file:
-      - src/.env
+      - backend/.env
     volumes:
       - media_volume:/src/media
     expose:
@@ -38,14 +38,14 @@ services:
     container_name: prometheus
     restart: unless-stopped
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./web/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     expose:
       - 9090
     depends_on:
-      - app
+      - backend
     networks:
       - custom
 
@@ -61,7 +61,7 @@ services:
     expose:
       - 3000
     depends_on:
-      - app
+      - backend
       - prometheus
     networks:
       - custom
@@ -84,7 +84,7 @@ services:
       - media_volume:/src/media
       - ./web/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - app
+      - backend
       - db
       - redis
       - prometheus

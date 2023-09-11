@@ -54,7 +54,7 @@ async def test_add_one_manager_invalid_phone_unique(auth_ac: AsyncClient):
     })
 
     assert response.status_code == 200
-    assert response.json()["detail"] == "UNIQUE constraint failed: manufacturermanager.phone"
+    assert response.json()["detail"] == "UNIQUE constraint failed: manufacturer_manager.phone"
 
 
 async def test_add_one_manager_invalid_phone_text(auth_ac: AsyncClient):
@@ -76,13 +76,13 @@ async def test_add_one_manager_invalid_email_unique(auth_ac: AsyncClient):
         "first_name": "Иван",
         "second_name": "Иванов",
         "last_name": "Иванович",
-        "phone": "+79859859898",
+        "phone": "+79839859898",
         "email": "ivan@test.com",
         "manufacturer_id": 1
     })
 
     assert response.status_code == 200
-    assert response.json()["detail"] == "UNIQUE constraint failed: manufacturermanager.email"
+    assert response.json()["detail"] == "UNIQUE constraint failed: manufacturer_manager.email"
 
 
 async def test_add_one_manager_invalid_email_symbols(auth_ac: AsyncClient):
