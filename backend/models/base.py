@@ -24,7 +24,7 @@ class AbstractUser(Base):
     registration_date: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.utcnow)
 
     def __str__(self):
-        return f'{self.second_name} {self.first_name[0]}. {self.last_name[0]}.'
+        return self.email
 
     @validates("first_name", "second_name", "last_name")
     def validate_name(self, key, *names):

@@ -1,12 +1,12 @@
 import os
 
-from fastapi import HTTPException
+from fastapi import HTTPException, File
 from sqlalchemy.exc import IntegrityError
 
 from db.db import MEDIA_URL, SITE_URL
 from models.store import Category, Product, Image, Customer, CustomerManager, Manufacturer, ManufacturerManager, Order, \
     Review, StaffManager, order_product
-from schemas.store import ProductCreate, OrderCreate, OrderUpdate, OrderRead
+from schemas.store import ProductCreate, OrderCreate, OrderUpdate, ProductUpdate
 from utils.repository import SQLAlchemyRepository, AddressFilterRepository, UserFilterRepository
 
 
@@ -17,7 +17,7 @@ class CategoryRepository(SQLAlchemyRepository):
 class ProductRepository(SQLAlchemyRepository):
     model = Product
 
-    async def add_one_product(self, data):
+    async def add_one_product(self, data: ProductCreate):
         try:
             res = self.model(**data.model_dump())
             res.categories = []
@@ -37,7 +37,7 @@ class ProductRepository(SQLAlchemyRepository):
         except IntegrityError as e:
             raise HTTPException(status_code=200, detail=str(e.orig))
 
-    async def edit_one_product(self, self_id: int, data):
+    async def edit_one_product(self, self_id: int, data: ProductUpdate):
         try:
             res = await self.session.get(self.model, self_id)
             if not res:
@@ -120,7 +120,7 @@ class OrderRepository(SQLAlchemyRepository):
 
             products = data.products
             data.products = []
-            res_data = data.model_dump(exclude_unset=True)
+            res_data = data.model_dump(exclude_unset=True, warnings=False)
 
             for key, value in res_data.items():
                 setattr(res, key, value)
@@ -160,7 +160,7 @@ class StaffManagerRepository(UserFilterRepository):
 class ImageRepository(SQLAlchemyRepository):
     model = Image
 
-    async def add_one_image(self, product_id, image):
+    async def add_one_image(self, product_id: int, image: File):
         try:
             contents = await image.read()
             filepath = f'{MEDIA_URL}/{image.filename}'

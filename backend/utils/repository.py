@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
+from typing import List, Dict
 
 from fastapi import HTTPException
-from sqlalchemy import select, insert
+from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,19 +20,19 @@ class SQLAlchemyRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_list(self, offset: int, limit: int):
+    async def get_list(self, offset: int, limit: int) -> List[BaseModel]:
         stmt = select(self.model).offset(offset).limit(limit)
         res = await self.session.execute(stmt)
         res = [row[0] for row in res.all()]
         return res
 
-    async def get_one(self, self_id: int):
+    async def get_one(self, self_id: int) -> BaseModel:
         res = await self.session.get(self.model, self_id)
         if not res:
             raise HTTPException(status_code=404, detail="Not found")
         return res
 
-    async def add_one(self, data):
+    async def add_one(self, data: BaseModel) -> BaseModel:
         try:
             res = self.model(**data.model_dump())
             self.session.add(res)
@@ -42,7 +44,7 @@ class SQLAlchemyRepository(AbstractRepository):
         except IntegrityError as e:
             raise HTTPException(status_code=200, detail=str(e.orig))
 
-    async def edit_one(self, self_id: int, data):
+    async def edit_one(self, self_id: int, data: BaseModel) -> BaseModel:
         try:
             res = await self.session.get(self.model, self_id)
             if not res:
@@ -57,7 +59,7 @@ class SQLAlchemyRepository(AbstractRepository):
         except ValueError as e:
             raise HTTPException(status_code=200, detail=str(e))
 
-    async def delete_one(self, self_id: int):
+    async def delete_one(self, self_id: int) -> Dict:
         res = await self.session.get(self.model, self_id)
         if not res:
             raise HTTPException(status_code=404, detail="Not found")
@@ -67,7 +69,8 @@ class SQLAlchemyRepository(AbstractRepository):
 
 
 class AddressFilterRepository(SQLAlchemyRepository):
-    async def get_address_filter_list(self, offset: int, limit: int, city: str, street: str, metro_station: str):
+    async def get_address_filter_list(self, offset: int, limit: int, city: str, street: str, metro_station: str) -> \
+            List[BaseModel]:
         stmt = select(self.model).offset(offset).limit(limit)
         res = await self.session.execute(stmt)
         res = [row[0] for row in res.all()]
@@ -81,7 +84,7 @@ class AddressFilterRepository(SQLAlchemyRepository):
 
 
 class UserFilterRepository(SQLAlchemyRepository):
-    async def get_user_filter_list(self, offset: int, limit: int, phone: str, email: str):
+    async def get_user_filter_list(self, offset: int, limit: int, phone: str, email: str) -> List[BaseModel]:
         stmt = select(self.model).offset(offset).limit(limit)
         res = await self.session.execute(stmt)
         res = [row[0] for row in res.all()]

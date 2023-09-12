@@ -1,6 +1,6 @@
 import datetime
 import os
-from typing import Optional, Annotated
+from typing import Optional, Annotated, Union, Dict
 
 from dotenv import load_dotenv
 from fastapi import HTTPException, Depends
@@ -34,7 +34,7 @@ class Hasher:
         return pwd_context.hash(password)
 
 
-async def get_user_by_email(email: str, session: AsyncSession):
+async def get_user_by_email(email: str, session: AsyncSession) -> User:
     stmt = select(User).where(User.email == email)
     res = await session.execute(stmt)
     res = res.scalar_one_or_none()
@@ -43,16 +43,16 @@ async def get_user_by_email(email: str, session: AsyncSession):
     return res
 
 
-async def authenticate_user(email: str, password: str, session: AsyncSession):
+async def authenticate_user(email: str, password: str, session: AsyncSession) -> Union[User, bool]:
     user = await get_user_by_email(email, session)
-    if user is None:
-        return
+    if not user:
+        return False
     if not Hasher.verify_password(password, user.hashed_password):
-        return
+        return False
     return user
 
 
-async def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None):
+async def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None) -> jwt:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.datetime.utcnow() + expires_delta
@@ -64,7 +64,7 @@ async def create_access_token(data: dict, expires_delta: Optional[datetime.timed
 
 
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
-                                 session: AsyncSession = Depends(get_session)):
+                                 session: AsyncSession = Depends(get_session)) -> Dict:
     user = await authenticate_user(form_data.username, form_data.password, session)
     if not user:
         raise HTTPException(status_code=200, detail="Incorrect username or password")

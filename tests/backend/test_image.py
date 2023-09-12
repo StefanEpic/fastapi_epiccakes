@@ -1,11 +1,10 @@
 import os
 
 from httpx import AsyncClient
-from fastapi.testclient import TestClient
 
 
 async def test_add_one_image(auth_ac: AsyncClient):
-    filepath = f'{os.path.abspath(os.curdir)}/tests/testfile.jpg'
+    filepath = f'{os.path.abspath(os.curdir)}/tests/backend/testfile.jpg'
     with open(filepath, "rb") as image:
         response = await auth_ac.post("/images", params={"product_id": 1}, files={"image": image})
 
@@ -15,7 +14,7 @@ async def test_add_one_image(auth_ac: AsyncClient):
 
 
 async def test_add_one_image_invalid_product(auth_ac: AsyncClient):
-    filepath = f'{os.path.abspath(os.curdir)}/tests/testfile.jpg'
+    filepath = f'{os.path.abspath(os.curdir)}/tests/backend/testfile.jpg'
     with open(filepath, "rb") as image:
         response = await auth_ac.post("/images", params={"product_id": 3}, files={"image": image})
 
@@ -24,7 +23,7 @@ async def test_add_one_image_invalid_product(auth_ac: AsyncClient):
 
 
 async def test_add_one_image_title_unique(auth_ac: AsyncClient):
-    filepath = f'{os.path.abspath(os.curdir)}/tests/testfile.jpg'
+    filepath = f'{os.path.abspath(os.curdir)}/tests/backend/testfile.jpg'
     with open(filepath, "rb") as image:
         response = await auth_ac.post("/images", params={"product_id": 1}, files={"image": image})
 

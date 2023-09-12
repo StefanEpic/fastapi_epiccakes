@@ -29,7 +29,7 @@ order_product = Table(
 class Customer(AbstractCompany):
     __tablename__ = "customer"
 
-    managers: Mapped["CustomerManager"] = relationship(back_populates="customer", lazy="noload")
+    managers: Mapped[List["CustomerManager"]] = relationship(back_populates="customer", lazy="selectin")
     orders: Mapped["Order"] = relationship(back_populates="customer")
     reviews: Mapped["Review"] = relationship(back_populates="customer")
 
@@ -37,7 +37,7 @@ class Customer(AbstractCompany):
 class Manufacturer(AbstractCompany):
     __tablename__ = "manufacturer"
 
-    managers: Mapped["ManufacturerManager"] = relationship(back_populates="manufacturer", lazy="noload")
+    managers: Mapped[List["ManufacturerManager"]] = relationship(back_populates="manufacturer", lazy="selectin")
     products: Mapped["Product"] = relationship(back_populates="manufacturer")
 
 
@@ -60,7 +60,7 @@ class StaffManager(AbstractUser):
 
     job_title: Mapped[JobTitle]
 
-    orders: Mapped["Order"] = relationship(back_populates="staff_manager", lazy='noload')
+    orders: Mapped[List["Order"]] = relationship(back_populates="staff_manager", lazy='selectin')
 
 
 class Category(Base):
