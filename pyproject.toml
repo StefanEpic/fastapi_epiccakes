@@ -17,6 +17,7 @@ passlib = "^1.7.4"
 sentry-sdk = {extras = ["fastapi"], version = "^1.30.0"}
 prometheus-fastapi-instrumentator = "^6.1.0"
 aiogram = "^3.0.0"
+requests = "^2.31.0"
 
 [tool.poetry.dev-dependencies]
 aiosqlite = "^0.19.0"
