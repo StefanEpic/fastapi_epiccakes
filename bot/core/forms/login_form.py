@@ -1,7 +1,7 @@
 import requests
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 from config import SITE_URL
 from core.db import users_tokens
@@ -12,8 +12,8 @@ class LoginForm(StatesGroup):
     GET_PASSWORD = State()
 
 
-async def get_username(message: Message, state: FSMContext):
-    await message.reply("Введите Ваш логин:")
+async def get_username(call: CallbackQuery, state: FSMContext):
+    await call.message.answer("Введите Ваш логин:")
     await state.set_state(LoginForm.GET_USERNAME)
 
 
