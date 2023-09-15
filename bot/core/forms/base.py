@@ -5,19 +5,20 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from config import SITE_URL
-from core.db import users_tokens
+from core.db import db, key
 
 
 async def get_find(message: Message, state: FSMContext, title: str, param: str, answer: str):
     try:
         text = quote(message.text)
+        token = db.hget(key, message.from_user.id)
         response = requests.get(f"{SITE_URL}/{title}_managers?{param}={text}",
-                                headers={"Authorization": f"Bearer {users_tokens[message.from_user.id]}"})
+                                headers={"Authorization": f"Bearer {token}"})
         user = response.json()
         if user:
             user = user[0]
             response = requests.get(f"{SITE_URL}/{title}s/{user['id']}",
-                                    headers={"Authorization": f"Bearer {users_tokens[message.from_user.id]}"})
+                                    headers={"Authorization": f"Bearer {token}"})
             company = response.json()
 
             await message.reply(

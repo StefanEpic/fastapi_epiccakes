@@ -93,6 +93,26 @@ services:
       - custom
 
 
+  bot:
+    container_name: bot
+    image: bot
+    restart: always
+    build:
+      context: .
+      dockerfile: ./bot/Dockerfile
+    env_file:
+      - bot/.env
+    expose:
+      - 6000
+    depends_on:
+      - db
+      - backend
+      - redis
+      - web
+    networks:
+      - custom
+
+
 networks:
   custom:
     driver: bridge

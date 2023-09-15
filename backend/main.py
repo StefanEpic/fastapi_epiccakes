@@ -1,7 +1,5 @@
-import os
-
 import sentry_sdk
-from dotenv import load_dotenv
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
@@ -14,10 +12,8 @@ from sqladmin import Admin
 
 from api.routers import all_routers
 from api.sqladmin.views import all_views, authentication_backend
+from config import SENTRY_TOKEN
 from db.db import engine
-
-load_dotenv()
-SENTRY_TOKEN = os.environ.get("SENTRY_TOKEN")
 
 sentry_sdk.init(dsn=SENTRY_TOKEN, traces_sample_rate=1.0, )
 

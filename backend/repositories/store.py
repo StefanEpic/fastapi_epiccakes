@@ -3,7 +3,7 @@ import os
 from fastapi import HTTPException, File
 from sqlalchemy.exc import IntegrityError
 
-from db.db import MEDIA_URL, SITE_URL
+from config import MEDIA_URL, SITE_URL
 from models.store import Category, Product, Image, Customer, CustomerManager, Manufacturer, ManufacturerManager, Order, \
     Review, StaffManager, order_product
 from schemas.store import ProductCreate, OrderCreate, OrderUpdate, ProductUpdate

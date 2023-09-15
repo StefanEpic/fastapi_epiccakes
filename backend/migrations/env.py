@@ -1,14 +1,13 @@
 import asyncio
-import os
 from logging.config import fileConfig
 
-from dotenv import load_dotenv
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
+from config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS
 from models.store import *
 from models.auth import *
 
@@ -16,14 +15,12 @@ from models.auth import *
 # access to the values within the .ini file in use.
 config = context.config
 
-load_dotenv()
-
 section = config.config_ini_section
-config.set_section_option(section, "DB_HOST", os.environ.get("DB_HOST"))
-config.set_section_option(section, "DB_PORT", os.environ.get("DB_PORT"))
-config.set_section_option(section, "DB_USER", os.environ.get("DB_USER"))
-config.set_section_option(section, "DB_NAME", os.environ.get("DB_NAME"))
-config.set_section_option(section, "DB_PASS", os.environ.get("DB_PASS"))
+config.set_section_option(section, "DB_HOST", DB_HOST)
+config.set_section_option(section, "DB_PORT", DB_PORT)
+config.set_section_option(section, "DB_USER", DB_USER)
+config.set_section_option(section, "DB_NAME", DB_NAME)
+config.set_section_option(section, "DB_PASS", DB_PASS)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

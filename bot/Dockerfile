@@ -13,17 +13,12 @@ ENV YOUR_ENV=${YOUR_ENV} \
 
 RUN pip install "poetry==$POETRY_VERSION"
 
-WORKDIR /backend
-COPY poetry.lock pyproject.toml /backend/
+WORKDIR /bot
+COPY poetry.lock pyproject.toml /bot/
 
 RUN poetry config virtualenvs.create false \
   && poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
 
-RUN apk add --update --no-cache postgresql-client jpeg-dev
-RUN apk add --update --no-cache --virtual .tmp-build-deps \
-    gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
-RUN apk del .tmp-build-deps
+COPY ./bot .
 
-COPY ./backend .
-
-CMD gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --forwarded-allow-ips='*' --bind=0.0.0.0:8000
+CMD python main.py
