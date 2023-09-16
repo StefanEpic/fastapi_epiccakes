@@ -4,7 +4,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery
 
 from config import SITE_URL
-from core.db import db, key
+from core.db import db
 
 
 class LoginForm(StatesGroup):
@@ -35,7 +35,7 @@ async def login(message: Message, state: FSMContext):
                              headers={"content-type": "application/x-www-form-urlencoded"})
     if response.status_code == 200:
         token = response.json()['access_token']
-        db.hset(key, message.from_user.id, token)
+        db.setex(message.from_user.id, 86400, token)
         await message.reply("Авторизация успешна!")
     else:
         await message.reply("Ошибка авторизации!")

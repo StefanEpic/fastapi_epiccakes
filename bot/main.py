@@ -9,7 +9,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from config import BOT_TOKEN
 from core.commands.base import start_bot
 from core.commands.callback import manufacturer, customer
-from core.commands.commands import start
+from core.commands.commands import start, menu
 from core.forms.find_form import get_manufacturer_email, get_manufacturer_phone, manufacturer_email_find, \
     manufacturer_phone_find, ManufacturerEmailFindForm, ManufacturerPhoneFindForm, get_customer_email, \
     get_customer_phone, customer_email_find, customer_phone_find, CustomerEmailFindForm, CustomerPhoneFindForm
@@ -21,6 +21,7 @@ async def main():
     dp = Dispatcher(storage=MemoryStorage())
     dp.startup.register(start_bot)
     dp.message.register(start, Command(commands='start'))
+    dp.message.register(menu, Command(commands='menu'))
 
     dp.callback_query.register(get_username, F.data.startswith('login'))
     dp.message.register(get_password, LoginForm.GET_USERNAME)

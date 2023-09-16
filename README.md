@@ -11,7 +11,7 @@
 
 АPI for online store
 
-<img src="https://github.com/StefanEpic/fastapi_epiccakes/blob/main/src/media/001.jpg" width="600">
+<img src="https://github.com/StefanEpic/fastapi_epiccakes/blob/main/backend/media/001.jpg" width="600">
 
 ## 🍰 Usage
 The API allows you to work with online store requests. Allows you to work with entities: products, orders, manufacturers, customers, reviews. There is also registration and authorization, admin panel, logging and metrics.
@@ -19,20 +19,22 @@ The API allows you to work with online store requests. Allows you to work with e
 ## 🍪 API demo
 You can test:
 
-[Docs](http://31.129.98.245/docs):
+👉 [Docs](http://31.129.98.245/docs):
 
 - username: admin@admin.com
 - password: 12345
 
-[Admin panel](http://31.129.98.245/admin):
+👉 [Admin panel](http://31.129.98.245/admin):
 
 - username: admin@admin.com
 - password: 12345
 
-[Metrics](http://31.129.98.245/grafana/d/_eX4mpl3/fastapi-dashboard?orgId=1&refresh=5s&from=now-24h&to=now):
+👉 [Metrics](http://31.129.98.245/grafana/d/_eX4mpl3/fastapi-dashboard?orgId=1&refresh=5s&from=now-24h&to=now):
 
 - username: admin
 - password: 12345
+
+👉 And [Telegram Bot](https://t.me/epiccakesbot)!
 
 ## 🍩 Tests
 ```

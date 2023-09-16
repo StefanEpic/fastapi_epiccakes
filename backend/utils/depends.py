@@ -45,7 +45,7 @@ async def customer_update(manager: CustomerManagerUpdate,
 
 async def manufacturer_create(manager: ManufacturerManagerCreate,
                               session: AsyncSession = Depends(get_session)) -> ManufacturerManagerCreate:
-    res = await session.get(Customer, manager.manufacturer_id)
+    res = await session.get(Manufacturer, manager.manufacturer_id)
     if not res:
         raise HTTPException(status_code=404, detail="Manufacturer with this id not found")
     return manager
@@ -54,7 +54,7 @@ async def manufacturer_create(manager: ManufacturerManagerCreate,
 async def manufacturer_update(manager: ManufacturerManagerUpdate,
                               session: AsyncSession = Depends(get_session)) -> ManufacturerManagerUpdate:
     if manager.manufacturer_id:
-        res = await session.get(Customer, manager.manufacturer_id)
+        res = await session.get(Manufacturer, manager.manufacturer_id)
         if not res:
             raise HTTPException(status_code=404, detail="Manufacturer with this id not found")
     return manager

@@ -45,5 +45,5 @@ Instrumentator().instrument(app).expose(app)
 
 @app.on_event("startup")
 async def startup():
-    redis = aioredis.from_url("redis://localhost")
+    redis = aioredis.from_url("redis://redis")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
