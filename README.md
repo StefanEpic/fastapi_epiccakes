@@ -36,6 +36,11 @@ You can test:
 
 👉 And [Telegram Bot](https://t.me/epiccakesbot)!
 
+Using a telegram bot you can quickly find complete information about managers by email or phone.
+
+- username: admin@admin.com
+- password: 12345
+
 ## 🍩 Tests
 ```
 Name                                    Stmts   Miss Branch BrPart  Cover
